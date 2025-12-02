@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台股技術分析儀 - GitHub Pages 版本</title>
+    <!-- 引入 Tailwind CSS CDN (用於樣式) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 React, ReactDOM, and Babel (用於運行 JSX) -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- 配置 Tailwind CSS (使用 Inter 字體) -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+            },
+          }
+        }
+      }
+    </script>
+    <style>
+      /* 確保主體使用 Inter 和繁體中文 Noto Sans TC */
+      body {
+        font-family: 'Inter', 'Noto Sans TC', sans-serif;
+      }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="root">
+        <!-- 應用程式將在此處載入 -->
+    </div>
+
+    <!-- 應用程式邏輯 (使用 Babel 處理 JSX) -->
+    <script type="text/babel">
+    const { useState, useEffect, useCallback } = React;
+    // 使用 Lucide Icons 的 SVG 形式，避免引入外部依賴
+    // <IconName size={...} />
+    const Plus = ({ size = 24, className = "" }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    );
+    const Trash2 = ({ size = 24, className = "" }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+    );
+    const RefreshCw = ({ size = 24, className = "" }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.5 15a9 9 0 0 1 14.8-8.2l-2.4 2.3"></path><path d="M20.5 9a9 9 0 0 1-14.8 8.2l2.4-2.3"></path></svg>
+    );
+    const AlertCircle = ({ size = 24, className = "" }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    );
+    const TrendingUp = ({ size = 24, className = "" }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="22 10 18 14 15 11 2 22"></polyline><polyline points="15 17 20 17 22 15"></polyline></svg>
+    );
+    const TrendingDown = ({ size = 24, className = "" }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="22 17 18 13 15 16 2 4"></polyline><polyline points="15 9 20 9 22 11"></polyline></svg>
+    );
+    const Activity = ({ size = 24, className = "" }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+    );
+    const Clock = ({ size = 24, className = "" }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    );
+    const WifiOff = ({ size = 24, className = "" }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16.72 11.06A10.94 10.94 0 0 0 19 12h2a15 15 0 0 0-4.77-5.59"></path><path d="M8.53 16.29a5 5 0 0 1-1.42-.31"></path><path d="M11.64 16.5A5.96 5.96 0 0 0 14 16"></path><path d="M2.5 8.5C4.78 6.54 7.55 5.25 10.5 5.03"></path></svg>
+    );
+    const ChevronDown = ({ size = 24, className = "" }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="6 9 12 15 18 9"></polyline></svg>
+    );
+
+    // --- Gemini API 設定與工具 ---
+    const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=";
+    const API_KEY = ""; // 在 Canvas 中會自動注入
+
+    // Utility for Exponential Backoff and Fetching (處理網路延遲和重試)
+    const fetchWithBackoff = async (url, options, maxRetries = 5) => {
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          // 確保在 Canvas 外部環境使用時，API Key 能夠被加入
+          let finalUrl = url;
+          if (url.includes('generativelanguage.googleapis.com') && API_KEY === "") {
+              // 模擬 Canvas 外部的 API Key 注入邏輯
+              // 在實際部署到 GitHub Pages 時，用戶需要自己替換 API_KEY
+              // 這裡假設 API Key 是空的，如果用戶部署，需要自己處理 CORS 和 Key
+          }
+
+          const response = await fetch(finalUrl, options);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return await response.json();
+        } catch (error) {
+          if (attempt === maxRetries - 1) {
+            throw error;
+          }
+          const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    };
+
+    // 呼叫 Gemini API 進行帶有 Google Search 的文本生成
+    const callGeminiApi = async (userQuery, systemPrompt, useSearch = false) => {
+        const url = GEMINI_API_URL + API_KEY;
+        
+        const payload = {
+            contents: [{ parts: [{ text: userQuery }] }],
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+        };
+
+        if (useSearch) {
+            payload.tools = [{ "google_search": {} }];
+        }
+
+        const response = await fetchWithBackoff(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const candidate = response.candidates?.[0];
+        if (candidate && candidate.content?.parts?.[0]?.text) {
+            const text = candidate.content.parts[0].text;
+            let sources = [];
+            const groundingMetadata = candidate.groundingMetadata;
+            if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                sources = groundingMetadata.groundingAttributions
+                    .map(attribution => ({
+                        uri: attribution.web?.uri,
+                        title: attribution.web?.title,
+                    }))
+                    .filter(source => source.uri && source.title);
+            }
+            return { text, sources };
+        }
+        throw new Error("Gemini API returned no content.");
+    };
+
+    // --- 工具函數區 ---
+    const lastValid = (arr) => {
+      if (!arr || !arr.length) return null;
+      for (let i = arr.length - 1; i >= 0; i--) {
+        if (typeof arr[i] === "number" && !isNaN(arr[i])) return arr[i];
+      }
+      return null;
+    };
+
+    const avgTail = (arr, n) => {
+      const a = arr.slice(-n).filter(x => typeof x === "number" && !isNaN(x));
+      if (!a.length) return 0;
+      return a.reduce((p, c) => p + c, 0) / a.length;
+    };
+
+    const calcRSI = (closes, len) => {
+      if (closes.length < len + 1) return 50;
+      let g = 0, l = 0;
+      for (let i = closes.length - (len + 1); i < closes.length - 1; i++) {
+        const d = closes[i + 1] - closes[i];
+        if (d > 0) g += d; else l -= d;
+      }
+      const ag = g / len, al = l / len;
+      const rs = (al === 0) ? 100 : ag / al;
+      return 100 - (100 / (1 + rs));
+    };
+
+    const emaSeries = (arr, span) => {
+      if (arr.length === 0) return [];
+      const k = 2 / (span + 1);
+      let e = arr[0];
+      const out = [e];
+      for (let i = 1; i < arr.length; i++) {
+        e = arr[i] * k + e * (1 - k);
+        out.push(e);
+      }
+      return out;
+    };
+
+    const calcMACD = (closes) => {
+      if (closes.length < 35) return { macd: 0, signal: 0, hist: 0 };
+      const ema12 = emaSeries(closes, 12);
+      const ema26 = emaSeries(closes, 26);
+      const validMacdLine = [];
+      for(let i=0; i<closes.length; i++) {
+          if(i < 25) { validMacdLine.push(0); } 
+          else { validMacdLine.push(ema12[i] - (ema26[i] || 0)); }
+      }
+      
+      const signalLine = emaSeries(validMacdLine, 9);
+      const macd = validMacdLine.at(-1);
+      const signal = signalLine.at(-1);
+      return { macd, signal, hist: macd - signal };
+    };
+
+    const lastPivotHigh = (highs, lb = 5) => {
+      for (let i = highs.length - lb - 1; i >= lb; i--) {
+        let ok = true;
+        for (let k = 1; k <= lb; k++) {
+          if (highs[i] <= highs[i - k] || highs[i] <= highs[i + k]) { ok = false; break; }
+        }
+        if (ok) return highs[i];
+      }
+      return null;
+    };
+
+    const lastPivotLow = (lows, lb = 5) => {
+      for (let i = lows.length - lb - 1; i >= lb; i--) {
+        let ok = true;
+        for (let k = 1; k <= lb; k++) {
+          if (lows[i] >= lows[i - k] || lows[i] >= lows[i + k]) { ok = false; break; }
+        }
+        if (ok) return lows[i];
+      }
+      return null;
+    };
+
+    const detectFalseBreakout = (highs, lows, closes, vols, tol = 0.001, volMul = 1.2) => {
+      const safeMax = highs.slice(-20).length > 0 ? Math.max(...highs.slice(-20)) : 0;
+      const safeMin = lows.slice(-20).length > 0 ? Math.min(...lows.slice(-20)) : 0;
+
+      const res = lastPivotHigh(highs) ?? safeMax;
+      const sup = lastPivotLow(lows) ?? safeMin;
+      
+      const h = highs.at(-1), l = lows.at(-1), c = closes.at(-1);
+      const v = vols.at(-1) || 0, avgV = avgTail(vols, 10);
+      
+      const bear = (h > res * (1 + tol)) && (c < res) && (v < avgV * volMul);
+      const bull = (l < sup * (1 - tol)) && (c > sup) && (v < avgV * volMul);
+      return { bear, bull };
+    };
+
+    // --- 網路請求輔助區 ---
+
+    const generateMockData = (code) => {
+      const count = 60;
+      const now = new Date();
+      const timestamps = [];
+      const closes = [], highs = [], lows = [], opens = [], vols = [];
+      
+      let price = (parseInt(code) || 100) % 500 + 50; 
+      if (price < 10) price = 100;
+
+      for(let i=0; i<count; i++) {
+        const time = new Date(now);
+        time.setDate(now.getDate() - (count - i));
+        timestamps.push(Math.floor(time.getTime() / 1000));
+        
+        const change = (Math.random() - 0.5) * price * 0.05; 
+        const open = price;
+        const close = price + change;
+        const high = Math.max(open, close) + Math.random() * price * 0.02;
+        const low = Math.min(open, close) - Math.random() * price * 0.02;
+        const vol = Math.floor(Math.random() * 5000 + 1000);
+        
+        opens.push(open);
+        closes.push(close);
+        highs.push(high);
+        lows.push(low);
+        vols.push(vol);
+        
+        price = close;
+      }
+      
+      return {
+        chart: {
+          result: [{
+            meta: { currency: "TWD", symbol: `${code}.TW` },
+            timestamp: timestamps,
+            indicators: {
+              quote: [{ open: opens, high: highs, low: lows, close: closes, volume: vols }]
+            }
+          }]
+        }
+      };
+    };
+
+    const fetchWithProxy = async (targetUrl) => {
+      const proxies = [
+        (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+      ];
+
+      for (const proxyGen of proxies) {
+        try {
+          const res = await fetch(proxyGen(targetUrl));
+          if (res.ok) {
+            return await res.json();
+          }
+        } catch (e) {
+          console.warn("Proxy failed, trying next...", e);
+        }
+      }
+      throw new Error("All proxies failed");
+    };
+
+    const fetchStockName = async (code) => {
+      const tryFetch = async (type) => {
+        try {
+          const url = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${type}_${code}.tw&json=1&delay=0`;
+          const data = await fetchWithProxy(url);
+          if (data.msgArray && data.msgArray[0] && data.msgArray[0].n) {
+            return data.msgArray[0].n;
+          }
+        } catch (e) {
+          return null;
+        }
+      };
+
+      let name = await tryFetch('tse');
+      if (!name) name = await tryFetch('otc');
+      return name || code;
+    };
+
+    // --- 元件區 ---
+
+    const StockCard = ({ code, onDelete }) => {
+      const [data, setData] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(null);
+      const [isMock, setIsMock] = useState(false);
+      
+      // LLM 狀態
+      const [llmSummary, setLlmSummary] = useState(null);
+      const [isLlmLoading, setIsLlmLoading] = useState(false);
+      const [llmError, setLlmError] = useState(null);
+
+      // 詳細數據切換
+      const [showDetails, setShowDetails] = useState(false); 
+
+
+      const fetchData = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        setIsMock(false);
+        // 重置 LLM 狀態
+        setLlmSummary(null);
+        setLlmError(null);
+        setShowDetails(false);
+
+        try {
+          let chartData = null;
+          let stockName = code;
+
+          // 1. 嘗試抓取真實數據
+          try {
+            const chartUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${code}.TW?interval=1d&range=3mo`;
+            
+            const [chartRes, nameRes] = await Promise.allSettled([
+              fetchWithProxy(chartUrl),
+              fetchStockName(code)
+            ]);
+
+            if (chartRes.status === 'fulfilled' && chartRes.value?.chart?.result) {
+              chartData = chartRes.value;
+            } else {
+              throw new Error("Yahoo API failed");
+            }
+
+            if (nameRes.status === 'fulfilled' && nameRes.value) {
+              stockName = nameRes.value;
+            }
+
+          } catch (networkError) {
+            console.warn("Network fetch failed, using mock data", networkError);
+            // 2. 如果網路失敗，使用模擬數據
+            chartData = generateMockData(code);
+            stockName = `${code} (模擬)`;
+            setIsMock(true);
+          }
+
+          const result = chartData.chart?.result?.[0];
+          if (!result) throw new Error("No Data");
+
+          const quote = result.indicators.quote[0];
+          const timestamps = result.timestamp;
+          
+          const closes = (quote.close || []).filter(n => typeof n === "number");
+          const highs = (quote.high || []).filter(n => typeof n === "number");
+          const lows = (quote.low || []).filter(n => typeof n === "number");
+          const vols = (quote.volume || []).filter(n => typeof n === "number");
+
+          if (closes.length < 28) throw new Error("Data insufficient");
+
+          // --- 指標計算 ---
+          const lastClose = lastValid(closes);
+          const volume = lastValid(vols);
+          const ts = lastValid(timestamps);
+          const dateStr = new Date(ts * 1000).toLocaleDateString();
+
+          const rsi14 = calcRSI(closes, 14);
+          const rsi28 = calcRSI(closes, 28);
+          const ma20 = avgTail(closes, 20);
+          const trend = (lastClose >= ma20) ? 1 : -1;
+          const avgV10 = avgTail(vols, 10);
+          const volStrength = (volume > avgV10 * 1.1) ? 1 : -1;
+          
+          // MACD destructuring: macd is MACD Line, signal is Signal Line, hist is Histogram
+          const { macd, signal, hist } = calcMACD(closes); 
+          const fb = detectFalseBreakout(highs, lows, closes, vols, 0.001, 1.2);
+          
+          const marketTrend = 1; 
+
+          const tech = (rsi14 < 40 && rsi28 < 45) ? 0.2 : (rsi14 > 70 && rsi28 > 65) ? 0.8 : 0.5;
+          let score = (0.6 * tech) +
+                      (0.2 * (trend === 1 ? 0.7 : 0.3)) +
+                      (0.1 * (volStrength === 1 ? 0.7 : 0.3)) +
+                      (0.1 * (marketTrend === 1 ? 0.7 : 0.3));
+
+          score += (hist > 0 ? +0.05 : -0.05);
+          if (fb.bear) score -= 0.15;
+          if (fb.bull) score += 0.10;
+          score = Math.max(0, Math.min(1, score));
+          
+          const conf = Math.round(score * 100);
+          
+          // 修正：避免與 MACD 的 signal 變數衝突
+          let finalSignalText = "觀望";
+          let signalType = "neutral";
+          if (score <= 0.35) { finalSignalText = "買進區"; signalType = "buy"; }
+          else if (score >= 0.65) { finalSignalText = "賣出區"; signalType = "sell"; }
+
+          setData({
+            name: stockName,
+            code: code,
+            price: lastClose,
+            change: lastClose - closes[closes.length-2],
+            rsi: rsi14.toFixed(1),
+            conf,
+            signal: finalSignalText, // 使用修正後的變數
+            signalType,
+            date: dateStr,
+            // FIX: 將 fb (False Breakout) 結果加入 details，避免渲染時讀取 undefined 屬性
+            details: { ma20, volStrength, hist, macd, signalLine: signal, avgV10, volume, fb } 
+          });
+
+        } catch (err) {
+          console.error(err);
+          setError("讀取失敗");
+        } finally {
+          setLoading(false);
+        }
+      }, [code]);
+
+      useEffect(() => {
+        fetchData();
+      }, [fetchData]);
+      
+      // LLM 觸發函式
+      const generateFundamentalInsight = async () => {
+          if (isLlmLoading || !data || isMock) return;
+      
+          setIsLlmLoading(true);
+          setLlmError(null);
+          setLlmSummary(null);
+      
+          const companyName = data.name.replace(/\s*\(模擬\)\s*/g, ''); // 移除模擬標記
+          const stockCode = data.code;
+      
+          // IMPORTANT: 當在 GitHub Pages 環境運行時，您需要手動提供 Gemini API Key，否則此功能將無法運作。
+          // 這裡假設 API Key 在 Canvas 環境中會被注入。在 GitHub Pages 上需要額外的伺服器端或安全設置來處理 Key。
+          if (API_KEY === "" && (typeof __initial_auth_token === 'undefined' || typeof __app_id === 'undefined')) {
+              setLlmError("AI 洞察功能需要有效的 Gemini API Key 才能在 GitHub Pages 上運行。");
+              setIsLlmLoading(false);
+              return;
+          }
+
+          const userQuery = `請以中文簡述 ${stockCode} ${companyName} 最近三個月的主要公司新聞、財報重點或重大事件。`;
+          const systemPrompt = "你是一位資深財經記者和分析師。請根據 Google Search 的結果，提供一個客觀、簡潔、專業的單段落總結 (100字以內)。不要提及股票代號，專注在公司基本面訊息。";
+      
+          try {
+              const result = await callGeminiApi(userQuery, systemPrompt, true);
+              setLlmSummary(result);
+          } catch (e) {
+              console.error("Gemini API Error:", e);
+              setLlmError("AI 洞察生成失敗，請稍後再試或檢查網路。");
+          } finally {
+              setIsLlmLoading(false);
+          }
+      };
+
+
+      const getCardColor = () => {
+        if (!data) return "border-gray-200 bg-white";
+        if (data.signalType === 'buy') return "border-blue-300 bg-blue-50";
+        if (data.signalType === 'sell') return "border-red-300 bg-red-50";
+        return "border-gray-200 bg-white";
+      };
+
+      const getBadgeColor = () => {
+        if (!data) return "bg-gray-100 text-gray-800";
+        if (data.signalType === 'buy') return "bg-blue-500 text-white";
+        if (data.signalType === 'sell') return "bg-red-500 text-white";
+        return "bg-gray-500 text-white";
+      };
+
+      if (error) return (
+        <div className="p-4 mb-3 border border-red-200 rounded-lg bg-red-50 flex justify-between items-center">
+          <div className="text-red-600 font-medium flex items-center gap-2">
+            <AlertCircle size={18}/> {code}: {error}
+          </div>
+          <button onClick={() => onDelete(code)} className="text-gray-400 hover:text-red-500"><Trash2 size={18}/></button>
+        </div>
+      );
+      
+      const priceDisplay = data?.price?.toFixed(2) ?? 'N/A';
+      const changeDisplay = data?.change?.toFixed(2) ?? 'N/A';
+      const isPositive = data && data.change >= 0;
+
+      return (
+        <div className={`p-4 mb-3 rounded-xl border-2 shadow-sm transition-all ${getCardColor()}`}>
+          {loading ? (
+            <div className="flex justify-center py-4 text-gray-400 animate-pulse">
+              <Activity size={24} className="animate-spin mr-2"/> 分析數據中...
+            </div>
+          ) : (
+            <div>
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    {data.name} 
+                    <span className="text-sm font-normal text-gray-400 bg-white px-1.5 rounded border border-gray-100">{data.code}</span>
+                    {isMock && (
+                      <span className="flex items-center gap-1 text-xs font-normal text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">
+                        <WifiOff size={10}/> 模擬數據
+                      </span>
+                    )}
+                  </h3>
+                  <div className="text-3xl font-black text-gray-900 mt-1">
+                    {priceDisplay}
+                    <span className={`text-sm ml-2 font-medium ${isPositive ? 'text-red-600' : 'text-green-600'}`}>
+                      {isPositive ? '▲' : '▼'} {changeDisplay}
+                    </span>
+                  </div>
+                </div>
+                <div className={`px-3 py-1.5 rounded-lg font-bold text-sm shadow-sm ${getBadgeColor()}`}>
+                  {data.signal}
+                </div>
+              </div>
+              
+              {/* 視覺化趨勢條 */}
+              <div className="w-full h-1 mb-4 rounded-full overflow-hidden bg-gray-200">
+                <div 
+                    className={`h-full transition-all duration-500`} 
+                    style={{ 
+                        width: `${data.conf}%`, 
+                        backgroundColor: data.signalType === 'buy' ? '#3b82f6' : data.signalType === 'sell' ? '#ef4444' : '#6b7280'
+                    }}
+                ></div>
+              </div>
+
+              {/* 關鍵指標 (RSI, Confidence) */}
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                {/* 更改背景為 bg-gray-50 */}
+                <div className="bg-gray-50 p-2 rounded-lg">
+                  <div className="text-xs text-gray-500 mb-1">RSI (14)</div>
+                  <div className={`text-lg font-bold ${parseFloat(data.rsi) < 30 ? 'text-blue-600' : parseFloat(data.rsi) > 70 ? 'text-red-600' : 'text-gray-700'}`}>
+                    {data.rsi}
+                  </div>
+                </div>
+                {/* 更改背景為 bg-gray-50 */}
+                <div className="bg-gray-50 p-2 rounded-lg">
+                  <div className="text-xs text-gray-500 mb-1">信心分數</div>
+                  <div className="text-lg font-bold text-gray-700">
+                    {data.conf} <span className="text-xs text-gray-400">/ 100</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 核心訊號 */}
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${isPositive ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                    股價趨勢 ({isPositive ? '上漲' : '下跌'})
+                </span>
+                {data.details.fb.bull && <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full font-medium">假跌破 (看多)</span>}
+                {data.details.fb.bear && <span className="px-2 py-0.5 bg-gray-800 text-white text-xs rounded-full font-medium">假突破 (看空)</span>}
+                {data.details.hist > 0 ? 
+                  <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">MACD多方</span> : 
+                  <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">MACD空方</span>
+                }
+              </div>
+              
+              {/* 詳細數據區塊 */}
+              <div className="mt-4 pt-3 border-t border-gray-200">
+                 <button 
+                    onClick={() => setShowDetails(prev => !prev)}
+                    className="w-full flex items-center justify-center gap-2 text-sm text-gray-600 py-1.5 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                 >
+                    <ChevronDown size={14} className={`transition-transform duration-300 ${showDetails ? 'rotate-180' : 'rotate-0'}`}/> 
+                    {showDetails ? '隱藏詳細數據' : '顯示詳細數據'}
+                 </button>
+                 
+                 {/* 優化詳細數據顯示，包含 MACD 線與訊號線值 */}
+                 {showDetails && data.details && (
+                    <div className="mt-3 p-3 bg-white border border-gray-200 rounded-lg shadow-inner grid grid-cols-2 gap-3 text-sm">
+                        <div className="col-span-2 text-xs text-gray-500 font-bold border-b pb-1 mb-1">技術細節</div>
+                        
+                        {/* MA20 */}
+                        <div>
+                            <div className="text-gray-500">MA20 均線</div>
+                            <div className="font-bold text-gray-800">{data.details.ma20.toFixed(2)}</div>
+                            <div className={`text-xs ${data.price > data.details.ma20 ? 'text-red-500' : 'text-green-500'}`}>
+                                {data.price > data.details.ma20 ? '股價在均線上' : '股價在均線下'}
+                            </div>
+                        </div>
+                        
+                        {/* Volume */}
+                        <div>
+                            <div className="text-gray-500">成交量 (萬股)</div>
+                            <div className={`font-bold ${data.details.volStrength === 1 ? 'text-red-500' : 'text-green-500'}`}>
+                                {(data.details.volume / 1000).toFixed(1)}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                                均量: {(data.details.avgV10 / 1000).toFixed(1)}
+                            </div>
+                        </div>
+
+                        {/* MACD Line & Signal */}
+                        <div className="col-span-2 pt-3 border-t">
+                            <div className="grid grid-cols-2 gap-3">
+                                {/* MACD Line Value */}
+                                <div>
+                                    <div className="text-gray-500">MACD 線</div>
+                                    <div className="font-bold text-gray-800">{data.details.macd.toFixed(4)}</div>
+                                </div>
+                                {/* Signal Line Value */}
+                                <div>
+                                    <div className="text-gray-500">訊號線 (9EMA)</div>
+                                    <div className="font-bold text-gray-800">{data.details.signalLine.toFixed(4)}</div>
+                                </div>
+                            </div>
+                            
+                            {/* MACD Hist Interpretation */}
+                            <div className="mt-2 p-2 bg-gray-50 rounded-lg">
+                                <div className="text-xs text-gray-500">MACD 動能判斷</div>
+                                <div className={`font-bold text-sm ${data.details.hist > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                                    {data.details.macd > data.details.signalLine ? '黃金交叉' : '死亡交叉'} / 柱狀線 {data.details.hist > 0 ? '擴大' : '縮小'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 )}
+              </div>
+              {/* --- 結束 詳細數據區塊 --- */}
+              
+              {/* LLM 區塊：基本面洞察 */}
+              <div className="mt-4 pt-3 border-t border-gray-200">
+                  <button 
+                      onClick={generateFundamentalInsight}
+                      disabled={isLlmLoading || isMock}
+                      className="w-full flex items-center justify-center gap-2 bg-purple-500 text-white py-2 rounded-lg font-bold hover:bg-purple-600 transition-colors disabled:bg-purple-300 disabled:cursor-not-allowed shadow-md"
+                      title={isMock ? "模擬數據下無法進行基本面分析" : "點擊獲取基本面總結"}
+                  >
+                      {isLlmLoading ? (
+                          <>
+                              <Activity size={16} className="animate-spin"/> 正在分析基本面...
+                          </>
+                      ) : (
+                          <>
+                              <span role="img" aria-label="sparkles">✨</span> 基本面洞察 (需 API Key)
+                          </>
+                      )}
+                  </button>
+                  
+                  {(llmSummary || llmError) && (
+                      <div className="mt-3 p-3 bg-white border border-purple-200 rounded-lg shadow-inner">
+                          <p className="font-semibold text-purple-700 mb-2 text-sm">AI 洞察</p>
+                          {llmError ? (
+                              <p className="text-sm text-red-500 flex items-center gap-1"><AlertCircle size={14}/> {llmError}</p>
+                          ) : (
+                              <>
+                                  <p className="text-sm text-gray-800 leading-relaxed">{llmSummary.text}</p>
+                                  {llmSummary.sources && llmSummary.sources.length > 0 && (
+                                      <div className="mt-2 pt-2 border-t border-gray-100">
+                                          <p className="text-xs text-gray-500 font-medium mb-1">參考來源:</p>
+                                          <ul className="list-disc ml-4 space-y-0.5">
+                                              {llmSummary.sources.slice(0, 3).map((source, index) => (
+                                                  <li key={index} className="text-xs text-blue-600 hover:text-blue-500 truncate">
+                                                      <a href={source.uri} target="_blank" rel="noopener noreferrer" title={source.title}>{source.title}</a>
+                                                  </li>
+                                              ))}
+                                          </ul>
+                                      </div>
+                                  )}
+                              </>
+                          )}
+                      </div>
+                  )}
+              </div>
+              {/* --- 結束 LLM 區塊 --- */}
+
+
+              <div className="flex justify-between items-center mt-4 border-t border-gray-200/50 pt-3">
+                 <div className="text-xs text-gray-400 flex items-center">
+                    <Clock size={10} className="mr-1"/> {data.date}
+                 </div>
+                 <div className="flex gap-3">
+                   <button onClick={fetchData} className="text-xs text-blue-600 flex items-center hover:underline">
+                     <RefreshCw size={12} className="mr-1"/> 更新
+                   </button>
+                   <button onClick={() => onDelete(code)} className="text-gray-400 hover:text-red-500 transition-colors">
+                     <Trash2 size={18}/>
+                   </button>
+                 </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    const App = () => {
+      const [inputCode, setInputCode] = useState("");
+      const [stocks, setStocks] = useState(() => {
+        // 使用 localStorage 儲存觀察清單
+        const saved = localStorage.getItem("myStocks");
+        return saved ? JSON.parse(saved) : ["2330", "2317", "0050"];
+      });
+
+      useEffect(() => {
+        localStorage.setItem("myStocks", JSON.stringify(stocks));
+      }, [stocks]);
+
+      const addStock = (e) => {
+        e.preventDefault();
+        const code = inputCode.trim();
+        if (code && !stocks.includes(code)) {
+          setStocks(prev => [code, ...prev]);
+          setInputCode("");
+        }
+      };
+
+      const removeStock = (code) => {
+        setStocks(prev => prev.filter(s => s !== code));
+      };
+
+      return (
+        <div className="min-h-screen bg-gray-100 pb-20 font-sans">
+          {/* 頂部導覽列 */}
+          <div className="bg-white sticky top-0 z-10 border-b border-gray-200 shadow-sm">
+            <div className="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
+              <h1 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <TrendingUp size={24} className="text-blue-600"/> 
+                台股戰情室
+              </h1>
+              <div className="text-xs text-gray-400">GitHub Pages 版本</div>
+            </div>
+          </div>
+
+          <div className="max-w-md mx-auto px-4 py-4 space-y-4">
+            <form onSubmit={addStock} className="relative">
+              <input
+                type="text"
+                value={inputCode}
+                onChange={(e) => setInputCode(e.target.value)}
+                placeholder="輸入代號 (如 2603)"
+                className="w-full pl-4 pr-12 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-lg"
+              />
+              <button 
+                type="submit"
+                className="absolute right-2 top-2 bg-blue-600 text-white p-1.5 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Plus size={20}/>
+              </button>
+            </form>
+
+            <div className="space-y-3">
+              {stocks.length === 0 && (
+                <div className="text-center text-gray-400 py-10">
+                  <TrendingDown size={48} className="mx-auto mb-2 opacity-20"/>
+                  <p>尚未加入任何觀察名單</p>
+                </div>
+              )}
+              
+              {stocks.map(code => (
+                <StockCard key={code} code={code} onDelete={removeStock} />
+              ))}
+            </div>
+
+            <div className="text-center text-xs text-gray-400 mt-8 px-4">
+              <p className="flex items-center justify-center gap-1"><AlertCircle size={10}/> 免責聲明：本工具僅供技術分析練習</p>
+              <p>不代表任何投資建議。資料來源可能延遲。</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    // 啟動 React 應用程式
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
