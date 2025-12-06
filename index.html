@@ -3,56 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>阿彬日記 (iOS Style)</title>
+    <title>阿彬日記</title>
     <!-- 引入 Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 React, ReactDOM, and Babel -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- 配置 Tailwind CSS (模擬 Apple System Fonts & Colors) -->
+    <!-- 配置 Tailwind CSS -->
     <script>
       tailwind.config = {
+        darkMode: 'class', // 啟用 class 模式
         theme: {
           extend: {
             fontFamily: {
-              sans: [
-                '-apple-system', 
-                'BlinkMacSystemFont', 
-                'San Francisco', 
-                'Helvetica Neue', 
-                'Inter', 
-                'Noto Sans TC', 
-                'sans-serif'
-              ],
+              sans: ['-apple-system', 'BlinkMacSystemFont', 'San Francisco', 'Helvetica Neue', 'Inter', 'Noto Sans TC', 'sans-serif'],
             },
             colors: {
               ios: {
-                bg: '#F2F2F7',      // System Grouped Background
-                card: '#FFFFFF',    // Secondary System Grouped Background
-                blue: '#007AFF',    // System Blue
-                green: '#34C759',   // System Green
-                red: '#FF3B30',     // System Red
-                gray: '#8E8E93',    // System Gray
-                gray2: '#AEAEB2',   // System Gray 2
-                gray3: '#C7C7CC',   // System Gray 3
-                gray4: '#D1D1D6',   // System Gray 4
-                gray5: '#E5E5EA',   // System Gray 5
-                gray6: '#F2F2F7',   // System Gray 6
-                separator: '#C6C6C8',
-                orange: '#FF9500',  // System Orange
-                purple: '#AF52DE',  // System Purple
-                indigo: '#5856D6',  // System Indigo
+                bg: 'var(--ios-bg)',
+                card: 'var(--ios-card)',
+                text: 'var(--ios-text)',
+                subtext: 'var(--ios-subtext)',
+                blue: '#007AFF', 
+                green: 'var(--ios-green)',
+                red: 'var(--ios-red)',
+                gray: 'var(--ios-gray)',
+                gray2: 'var(--ios-gray2)',
+                gray3: 'var(--ios-gray3)',
+                gray4: 'var(--ios-gray4)',
+                gray5: 'var(--ios-gray5)',
+                gray6: 'var(--ios-gray6)',
+                separator: 'var(--ios-separator)',
+                input: 'var(--ios-input)',
+                orange: '#FF9500',
+                purple: '#AF52DE',
+                indigo: '#5856D6',
               }
             },
             boxShadow: {
-              'ios-card': '0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02)',
-              'ios-float': '0 8px 24px rgba(0, 0, 0, 0.12)',
-              'ios-modal': '0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0,0,0,0.05)',
+              'ios-card': 'var(--ios-shadow-card)',
+              'ios-modal': 'var(--ios-shadow-modal)',
+              'ios-glow-blue': 'var(--ios-glow-blue)',
+              'ios-glow-red': 'var(--ios-glow-red)',
             },
             animation: {
               'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
               'scale-in': 'scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
             },
             keyframes: {
@@ -70,23 +66,69 @@
       }
     </script>
     <style>
+      /* 定義 CSS 變數來實現動態換色 */
+      :root {
+        /* Light Mode 預設值 */
+        --ios-bg: #F2F2F7;
+        --ios-card: #FFFFFF;
+        --ios-text: #000000;
+        --ios-subtext: #8E8E93;
+        --ios-gray: #8E8E93;
+        --ios-gray2: #AEAEB2;
+        --ios-gray3: #C7C7CC;
+        --ios-gray4: #D1D1D6;
+        --ios-gray5: #E5E5EA;
+        --ios-gray6: #f8f7fc; 
+        --ios-separator: #C6C6C8;
+        --ios-input: rgba(118,118,128,0.12);
+        --ios-green: #34C759;
+        --ios-red: #FF3B30;
+        --ios-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+        --ios-shadow-modal: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0,0,0,0.05);
+        --ios-glow-blue: 0 0 15px rgba(0, 122, 255, 0.3);
+        --ios-glow-red: 0 0 15px rgba(255, 59, 48, 0.3);
+        --ios-chart-grid: #E5E5EA;
+      }
+
+      /* Dark Mode 覆蓋值 */
+      body.dark {
+        --ios-bg: #000000;
+        --ios-card: #1C1C1E;
+        --ios-text: #FFFFFF;
+        --ios-subtext: #EBEBF5;
+        --ios-gray: #98989D;
+        --ios-gray2: #636366;
+        --ios-gray3: #48484A;
+        --ios-gray4: #3A3A3C;
+        --ios-gray5: #2C2C2E;
+        --ios-gray6: #1C1C1E;
+        --ios-separator: #38383A;
+        --ios-input: #2C2C2E;
+        --ios-green: #30D158;
+        --ios-red: #FF453A;
+        --ios-shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.1);
+        --ios-shadow-modal: 0 20px 40px rgba(0, 0, 0, 0.6); /* 移除外層額外陰影框線，使用 border 處理 */
+        --ios-glow-blue: 0 0 20px rgba(10, 132, 255, 0.4);
+        --ios-glow-red: 0 0 20px rgba(255, 69, 58, 0.4);
+        --ios-chart-grid: #3A3A3C;
+      }
+
       body {
         -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        background-color: #F2F2F7; /* iOS Base Background */
+        background-color: var(--ios-bg);
+        color: var(--ios-text);
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
-      /* 隱藏滾動條但保持功能 */
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-      /* iOS Input Style Override */
+      
+      /* Input style helper */
       .ios-input-shadow {
         box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
       }
+      body.dark .ios-input-shadow {
+        box-shadow: none;
+      }
+      
+      .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -95,49 +137,23 @@
     <script type="text/babel">
     const { useState, useEffect, useCallback } = React;
     
-    // --- SF Symbols Style Icons ---
-    const Plus = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-    );
-    const Trash2 = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-    );
-    const RefreshCw = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.5 15a9 9 0 0 1 14.8-8.2l-2.4 2.3"></path><path d="M20.5 9a9 9 0 0 1-14.8 8.2l2.4-2.3"></path></svg>
-    );
-    const AlertCircle = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-    );
-    const Settings = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-    );
-    const Key = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
-    );
-    const BarChart2 = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-    );
-    const Sparkles = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z"/></svg>
-    );
-    const Brain = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 16v-4"></path><path d="M12 8h.01"></path><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>
-    );
-    const ChevronDown = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="6 9 12 15 18 9"></polyline></svg>
-    );
-    const ShieldAlert = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-    );
-    const Target = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-    );
-    const List = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-    );
-    const Clock = ({ size = 20, className = "" }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-    );
+    // --- Icons ---
+    const Sun = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>);
+    const Moon = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>);
+    const Plus = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>);
+    const Trash2 = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>);
+    const RefreshCw = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.5 15a9 9 0 0 1 14.8-8.2l-2.4 2.3"></path><path d="M20.5 9a9 9 0 0 1-14.8 8.2l2.4-2.3"></path></svg>);
+    const AlertCircle = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>);
+    const Settings = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>);
+    const Key = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>);
+    const BarChart2 = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>);
+    const Sparkles = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z"/></svg>);
+    const Brain = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 16v-4"></path><path d="M12 8h.01"></path><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>);
+    const ChevronDown = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="6 9 12 15 18 9"></polyline></svg>);
+    const ShieldAlert = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>);
+    const Target = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>);
+    const List = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>);
+    const Clock = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>);
 
     // --- Gemini API & Utilities ---
     const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=";
@@ -300,7 +316,7 @@
             <div className="w-full h-40 mt-2 relative">
                 <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-full" preserveAspectRatio="none">
                     {[0.2, 0.4, 0.6, 0.8].map(p => (
-                        <line key={p} x1="0" y1={chartH * p} x2={chartW} y2={chartH * p} stroke="#E5E5EA" strokeWidth="1" strokeDasharray="3 3" />
+                        <line key={p} x1="0" y1={chartH * p} x2={chartW} y2={chartH * p} className="stroke-ios-gray3" strokeWidth="0.5" strokeDasharray="3 3" />
                     ))}
 
                     {slicedCloses.map((close, i) => {
@@ -314,20 +330,17 @@
                         const yClose = chartH - ((close - plotMin) / plotRange) * chartH;
                         
                         const isUp = close >= open;
-                        const displayColor = isUp ? "#FF3B30" : "#34C759"; 
-
-                        const barTop = Math.min(yOpen, yClose);
-                        const barHeight = Math.abs(yClose - yOpen) || 1;
-
+                        const displayColor = isUp ? "#FF453A" : "#30D158"; 
+                        
                         return (
                             <g key={i}>
                                 <line x1={x + candleWidth/2} y1={yHigh} x2={x + candleWidth/2} y2={yLow} stroke={displayColor} strokeWidth="1" strokeLinecap="round"/>
-                                <rect x={x} y={barTop} width={candleWidth} height={barHeight} fill={displayColor} rx="1" />
+                                <rect x={x} y={Math.min(yOpen, yClose)} width={candleWidth} height={Math.abs(yClose - yOpen) || 1} fill={displayColor} rx="1" />
                             </g>
                         );
                     })}
                 </svg>
-                <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-between text-[9px] text-ios-gray4 py-1 pointer-events-none">
+                <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-between text-[9px] text-ios-gray py-1 pointer-events-none">
                      <span>{maxPrice.toFixed(0)}</span>
                      <span>{minPrice.toFixed(0)}</span>
                 </div>
@@ -391,14 +404,14 @@
         if (!isOpen) return null;
 
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/10 backdrop-blur-[2px] transition-all duration-300">
-                <div className="bg-white/85 backdrop-blur-2xl rounded-[28px] shadow-ios-modal w-[280px] overflow-hidden animate-scale-in border border-white/40">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] transition-all duration-300">
+                <div className="bg-ios-card rounded-[28px] shadow-ios-modal w-[280px] overflow-hidden animate-scale-in border border-gray-200 dark:border-white/10">
                     <div className="pt-6 pb-4 px-5 text-center">
                         <div className="mx-auto w-10 h-10 bg-gradient-to-tr from-ios-blue to-[#5AC8FA] rounded-full flex items-center justify-center mb-3 shadow-lg shadow-blue-500/20">
                             <Key size={18} className="text-white"/>
                         </div>
-                        <h3 className="text-[17px] font-semibold text-black mb-1 tracking-tight">API 設定</h3>
-                        <p className="text-[12px] leading-relaxed text-ios-gray">
+                        <h3 className="text-[17px] font-semibold text-ios-text mb-1 tracking-tight">API 設定</h3>
+                        <p className="text-[12px] leading-relaxed text-ios-subtext">
                             請輸入您的 Gemini API Key<br/>以啟用 AI 戰略功能
                         </p>
                         <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-ios-blue text-[12px] font-medium mt-2 inline-block hover:opacity-70 transition-opacity">
@@ -411,11 +424,11 @@
                             value={tempKey}
                             onChange={(e) => setTempKey(e.target.value)}
                             placeholder="sk-..."
-                            className="w-full px-3 py-2 bg-[rgba(118,118,128,0.12)] border-none rounded-[10px] text-[15px] focus:ring-0 text-center transition-colors placeholder-ios-gray3 text-black ios-input-shadow"
+                            className="w-full px-3 py-2 bg-ios-input border-none rounded-[10px] text-[15px] focus:ring-0 text-center transition-colors placeholder-ios-gray3 text-ios-text ios-input-shadow"
                         />
                     </div>
-                    <div className="grid grid-cols-2 border-t border-gray-300/30 mt-4">
-                        <button onClick={onClose} className="py-3 text-[16px] text-ios-blue font-normal border-r border-gray-300/30 hover:bg-black/5 active:bg-black/10 transition-colors">取消</button>
+                    <div className="grid grid-cols-2 border-t border-gray-200 dark:border-white/10 mt-4">
+                        <button onClick={onClose} className="py-3 text-[16px] text-ios-blue font-normal border-r border-gray-200 dark:border-white/10 hover:bg-black/5 active:bg-black/10 transition-colors">取消</button>
                         <button onClick={handleSave} className="py-3 text-[16px] text-ios-blue font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">儲存</button>
                     </div>
                 </div>
@@ -435,12 +448,10 @@
       const [strategy, setStrategy] = useState(null);
       const [isStrategyLoading, setIsStrategyLoading] = useState(false);
       
-      // New States for Features
       const [keyLevels, setKeyLevels] = useState(null);
       const [riskAssessment, setRiskAssessment] = useState(null);
 
-      // Replaced individual toggle states with a single view mode
-      const [activeTab, setActiveTab] = useState('none'); // 'none', 'chart', 'details'
+      const [activeTab, setActiveTab] = useState('none'); 
 
       const fetchData = useCallback(async () => {
         setLoading(true); setError(null); setIsMock(false);
@@ -516,11 +527,10 @@
       
       const runAI = async (type) => {
           if (!apiKey) {
-              openSettings(); // Open the modal instead of alerting
+              openSettings(); 
               return;
           }
           
-          // Reset states based on type to show loading correctly if needed
           if (type === 'news') { setIsLlmLoading(true); setLlmError(null); setLlmSummary(null); }
           else if (type === 'strategy') { setIsStrategyLoading(true); setStrategy(null); }
           else if (type === 'levels') { setIsStrategyLoading(true); setKeyLevels(null); }
@@ -572,14 +582,14 @@
       const colorClass = isUp ? 'text-ios-red' : 'text-ios-green'; 
 
       let badgeBg = 'bg-ios-gray6 text-ios-gray';
-      if(data?.signalType === 'buy') badgeBg = 'bg-ios-blue/10 text-ios-blue'; 
-      if(data?.signalType === 'sell') badgeBg = 'bg-ios-red/10 text-ios-red';
+      if(data?.signalType === 'buy') badgeBg = 'bg-ios-blue/20 text-ios-blue'; 
+      if(data?.signalType === 'sell') badgeBg = 'bg-ios-red/20 text-ios-red';
 
       let ambientClass = "shadow-ios-card border border-transparent"; 
       if (data?.signalType === 'buy') {
-          ambientClass = "shadow-[0_0_30px_-5px_rgba(0,122,255,0.3)] border border-ios-blue/30 ring-1 ring-ios-blue/20";
+          ambientClass = "shadow-ios-glow-blue border border-ios-blue/30";
       } else if (data?.signalType === 'sell') {
-          ambientClass = "shadow-[0_0_30px_-5px_rgba(255,59,48,0.3)] border border-ios-red/30 ring-1 ring-ios-red/20";
+          ambientClass = "shadow-ios-glow-red border border-ios-red/30";
       }
 
       const toggleTab = (tab) => {
@@ -597,8 +607,8 @@
               <div className="flex justify-between items-start mb-1">
                 <div>
                   <div className="flex items-baseline gap-2">
-                    <h3 className="text-[22px] font-bold text-black tracking-tight">{data.name}</h3>
-                    <span className="text-[13px] font-semibold text-ios-gray2 bg-ios-gray6 px-1.5 py-0.5 rounded-md">{data.code}</span>
+                    <h3 className="text-[22px] font-bold text-ios-text tracking-tight">{data.name}</h3>
+                    <span className="text-[13px] font-semibold text-ios-gray2 bg-ios-gray5 px-1.5 py-0.5 rounded-md">{data.code}</span>
                   </div>
                 </div>
                 <div className={`px-3 py-1 rounded-full text-[13px] font-bold ${badgeBg}`}>
@@ -607,7 +617,7 @@
               </div>
 
               {/* Full Width Confidence Bar */}
-              <div className="w-full h-1.5 mb-4 rounded-full overflow-hidden bg-ios-gray6 mt-3">
+              <div className="w-full h-1.5 mb-4 rounded-full overflow-hidden bg-ios-gray5 mt-3">
                 <div 
                     className={`h-full transition-all duration-700 ease-out rounded-full ${data.signalType === 'buy' ? 'bg-ios-blue' : data.signalType === 'sell' ? 'bg-ios-red' : 'bg-ios-gray3'}`} 
                     style={{ width: `${data.conf}%` }}
@@ -624,29 +634,29 @@
                 </span>
               </div>
 
-              {/* Key Stats Row */}
+              {/* Key Stats Row - Fixed Visibility */}
               <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-ios-gray6/50 rounded-2xl p-3">
+                  <div className="bg-ios-gray6 dark:bg-ios-gray5 rounded-2xl p-3 border border-transparent dark:border-white/5">
                       <div className="text-[11px] font-semibold text-ios-gray uppercase mb-0.5">RSI 強度</div>
-                      <div className="text-[17px] font-semibold text-black">{data.rsi}</div>
+                      <div className="text-[17px] font-semibold text-ios-text">{data.rsi}</div>
                   </div>
-                  <div className="bg-ios-gray6/50 rounded-2xl p-3">
+                  <div className="bg-ios-gray6 dark:bg-ios-gray5 rounded-2xl p-3 border border-transparent dark:border-white/5">
                       <div className="text-[11px] font-semibold text-ios-gray uppercase mb-0.5">AI 信心分數</div>
-                      <div className="text-[17px] font-semibold text-black">{data.conf} <span className="text-[11px] font-normal text-ios-gray">/ 100</span></div>
+                      <div className="text-[17px] font-semibold text-ios-text">{data.conf} <span className="text-[11px] font-normal text-ios-gray">/ 100</span></div>
                   </div>
               </div>
 
               {/* Trend Tags */}
               <div className="flex flex-wrap gap-2 mb-4">
-                  <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${isUp ? 'bg-ios-red/10 text-ios-red' : 'bg-ios-green/10 text-ios-green'}`}>
+                  <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${isUp ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400' : 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'}`}>
                       {isUp ? '趨勢向上' : '趨勢向下'}
                   </span>
                   {data.details.hist > 0 ? 
-                    <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-ios-red/10 text-ios-red">MACD 多方</span> : 
-                    <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-ios-green/10 text-ios-green">MACD 空方</span>
+                    <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400">MACD 多方</span> : 
+                    <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400">MACD 空方</span>
                   }
-                  {data.details.fb.bull && <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-yellow-100 text-yellow-600">假跌破</span>}
-                  {data.details.fb.bear && <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-gray-200 text-gray-600">假突破</span>}
+                  {data.details.fb.bull && <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-ios-gray6 text-ios-orange">假跌破</span>}
+                  {data.details.fb.bear && <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-ios-gray6 text-ios-gray">假突破</span>}
               </div>
 
               {/* AI Action Buttons Grid (4 Buttons) */}
@@ -654,14 +664,14 @@
                   {/* Row 1 */}
                   <button 
                     onClick={() => runAI('news')} disabled={isLlmLoading}
-                    className="flex items-center justify-center gap-1.5 bg-ios-blue/10 active:bg-ios-blue/20 py-2.5 rounded-xl transition-colors"
+                    className="flex items-center justify-center gap-1.5 bg-ios-blue/10 active:bg-ios-blue/20 py-2.5 rounded-xl transition-colors hover:bg-ios-blue/20"
                   >
                     {isLlmLoading && !isStrategyLoading ? <div className="w-4 h-4 border-2 border-ios-blue/30 border-t-ios-blue rounded-full animate-spin"/> : <Sparkles size={16} className="text-ios-blue"/>}
                     <span className="text-[13px] font-semibold text-ios-blue">新聞摘要</span>
                   </button>
                   <button 
                     onClick={() => runAI('strategy')} disabled={isStrategyLoading}
-                    className="flex items-center justify-center gap-1.5 bg-ios-blue/10 active:bg-ios-blue/20 py-2.5 rounded-xl transition-colors"
+                    className="flex items-center justify-center gap-1.5 bg-ios-blue/10 active:bg-ios-blue/20 py-2.5 rounded-xl transition-colors hover:bg-ios-blue/20"
                   >
                     {isStrategyLoading && !isLlmLoading ? <div className="w-4 h-4 border-2 border-ios-blue/30 border-t-ios-blue rounded-full animate-spin"/> : <Brain size={16} className="text-ios-blue"/>}
                     <span className="text-[13px] font-semibold text-ios-blue">AI 診斷</span>
@@ -670,14 +680,14 @@
                   {/* Row 2 (New Features) */}
                   <button 
                     onClick={() => runAI('levels')} disabled={isStrategyLoading}
-                    className="flex items-center justify-center gap-1.5 bg-ios-orange/10 active:bg-ios-orange/20 py-2.5 rounded-xl transition-colors"
+                    className="flex items-center justify-center gap-1.5 bg-ios-orange/10 active:bg-ios-orange/20 py-2.5 rounded-xl transition-colors hover:bg-ios-orange/20"
                   >
                     <Target size={16} className="text-ios-orange"/>
                     <span className="text-[13px] font-semibold text-ios-orange">✨ 支撐壓力</span>
                   </button>
                   <button 
                     onClick={() => runAI('risk')} disabled={isStrategyLoading}
-                    className="flex items-center justify-center gap-1.5 bg-ios-purple/10 active:bg-ios-purple/20 py-2.5 rounded-xl transition-colors"
+                    className="flex items-center justify-center gap-1.5 bg-ios-purple/10 active:bg-ios-purple/20 py-2.5 rounded-xl transition-colors hover:bg-ios-purple/20"
                   >
                     <ShieldAlert size={16} className="text-ios-purple"/>
                     <span className="text-[13px] font-semibold text-ios-purple">✨ 風險評估</span>
@@ -686,41 +696,41 @@
 
               {/* AI Result Area (Unified) */}
               {(llmSummary || strategy || keyLevels || riskAssessment) && (
-                <div className="mb-4 bg-ios-gray6 rounded-xl p-3.5 animate-slide-up space-y-2">
+                <div className="mb-4 bg-ios-gray5 rounded-xl p-3.5 animate-slide-up space-y-2 border border-white/5">
                     {llmSummary && (
                         <div className="last:mb-0">
                             <div className="flex items-center gap-1.5 mb-1">
                                 <Sparkles size={12} className="text-ios-gray"/>
                                 <span className="text-[11px] font-bold text-ios-gray uppercase">新聞重點</span>
                             </div>
-                            <p className="text-[14px] leading-relaxed text-black">{llmSummary.text}</p>
+                            <p className="text-[14px] leading-relaxed text-ios-subtext">{llmSummary.text}</p>
                         </div>
                     )}
                     {strategy && (
-                        <div className="last:mb-0 pt-2 border-t border-gray-200/50">
+                        <div className="last:mb-0 pt-2 border-t border-ios-separator">
                             <div className="flex items-center gap-1.5 mb-1">
                                 <Brain size={12} className="text-ios-gray"/>
                                 <span className="text-[11px] font-bold text-ios-gray uppercase">策略建議</span>
                             </div>
-                            <p className="text-[14px] leading-relaxed text-black">{strategy}</p>
+                            <p className="text-[14px] leading-relaxed text-ios-subtext">{strategy}</p>
                         </div>
                     )}
                     {keyLevels && (
-                        <div className="last:mb-0 pt-2 border-t border-gray-200/50">
+                        <div className="last:mb-0 pt-2 border-t border-ios-separator">
                             <div className="flex items-center gap-1.5 mb-1">
                                 <Target size={12} className="text-ios-orange"/>
                                 <span className="text-[11px] font-bold text-ios-orange uppercase">關鍵價位</span>
                             </div>
-                            <p className="text-[14px] leading-relaxed text-black font-medium">{keyLevels}</p>
+                            <p className="text-[14px] leading-relaxed text-ios-subtext font-medium">{keyLevels}</p>
                         </div>
                     )}
                     {riskAssessment && (
-                        <div className="last:mb-0 pt-2 border-t border-gray-200/50">
+                        <div className="last:mb-0 pt-2 border-t border-ios-separator">
                             <div className="flex items-center gap-1.5 mb-1">
                                 <ShieldAlert size={12} className="text-ios-purple"/>
                                 <span className="text-[11px] font-bold text-ios-purple uppercase">風險評估</span>
                             </div>
-                            <p className="text-[14px] leading-relaxed text-black font-medium">{riskAssessment}</p>
+                            <p className="text-[14px] leading-relaxed text-ios-subtext font-medium">{riskAssessment}</p>
                         </div>
                     )}
                 </div>
@@ -728,16 +738,16 @@
 
               {/* IOS Segmented Control for Chart/Details */}
               <div className="mt-4">
-                  <div className="flex bg-ios-gray6 p-1 rounded-[10px]">
+                  <div className="flex bg-ios-gray6 dark:bg-ios-gray5 p-1 rounded-[10px]">
                       <button 
                           onClick={() => toggleTab('chart')}
-                          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-[8px] text-[13px] font-medium transition-all ${activeTab === 'chart' ? 'bg-white text-black shadow-sm' : 'text-ios-gray'}`}
+                          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-[8px] text-[13px] font-medium transition-all ${activeTab === 'chart' ? 'bg-white dark:bg-ios-gray2 text-black dark:text-white shadow-sm' : 'text-ios-gray hover:text-ios-text'}`}
                       >
                           <BarChart2 size={14}/> K線圖
                       </button>
                       <button 
                           onClick={() => toggleTab('details')}
-                          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-[8px] text-[13px] font-medium transition-all ${activeTab === 'details' ? 'bg-white text-black shadow-sm' : 'text-ios-gray'}`}
+                          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-[8px] text-[13px] font-medium transition-all ${activeTab === 'details' ? 'bg-white dark:bg-ios-gray2 text-black dark:text-white shadow-sm' : 'text-ios-gray hover:text-ios-text'}`}
                       >
                           <List size={14}/> 詳細數據
                       </button>
@@ -745,21 +755,21 @@
                   
                   {/* Footer Actions */}
                   <div className="flex justify-between items-center mt-2 px-1">
-                      <div className="text-[11px] text-ios-gray3 flex items-center gap-1">
-                          <Clock size={10}/> 資料日期: {data.date}
+                      <div className="text-[11px] text-ios-gray flex items-center gap-1">
+                          <Clock size={14}/> 資料日期: {data.date}
                       </div>
                       <div className="flex gap-4">
-                          <button onClick={fetchData} className="text-ios-gray4 hover:text-ios-blue transition-colors flex items-center gap-1 text-[11px] font-medium"><RefreshCw size={12}/> 更新</button>
-                          <button onClick={() => onDelete(code)} className="text-ios-gray4 hover:text-ios-red transition-colors flex items-center gap-1 text-[11px] font-medium"><Trash2 size={12}/> 移除</button>
+                          <button onClick={fetchData} className="text-ios-gray hover:text-ios-blue transition-colors flex items-center gap-1 text-[11px] font-medium"><RefreshCw size={12}/> 更新</button>
+                          <button onClick={() => onDelete(code)} className="text-ios-gray hover:text-ios-red transition-colors flex items-center gap-1 text-[11px] font-medium"><Trash2 size={12}/> 移除</button>
                       </div>
                   </div>
 
                   {activeTab === 'details' && data.details && (
-                    <div className="animate-slide-up mt-3 pt-3 border-t border-ios-gray6">
+                    <div className="animate-slide-up mt-3 pt-3 border-t border-ios-gray5">
                         <div className="grid grid-cols-2 gap-4 py-2 text-[13px]">
                             <div>
                                 <span className="text-ios-gray block mb-0.5">MA20 月線</span>
-                                <span className="font-semibold text-black block">{data.details.ma20.toFixed(2)}</span>
+                                <span className="font-semibold text-ios-text block">{data.details.ma20.toFixed(2)}</span>
                                 <span className={`text-[11px] font-medium ${data.price > data.details.ma20 ? 'text-ios-red' : 'text-ios-green'}`}>
                                     {data.price > data.details.ma20 ? '股價在均線上' : '股價在均線下'}
                                 </span>
@@ -767,20 +777,20 @@
                             <div>
                                 <span className="text-ios-gray block mb-0.5">成交量</span>
                                 <span className={`font-semibold ${data.details.volStrength === 1 ? 'text-ios-red' : 'text-ios-green'}`}>
-                                    {(data.details.volume/1000).toFixed(1)}張
+                                    {Math.floor(data.details.volume/1000).toLocaleString()}張
                                 </span>
                             </div>
                             <div>
                                 <span className="text-ios-gray block mb-0.5">MACD</span>
-                                <span className="font-semibold text-black">{data.details.macd.toFixed(2)}</span>
+                                <span className="font-semibold text-ios-text">{data.details.macd.toFixed(2)}</span>
                             </div>
                             <div>
                                 <span className="text-ios-gray block mb-0.5">訊號線 (9EMA)</span>
-                                <span className="font-semibold text-black">{data.details.signalLine.toFixed(2)}</span>
+                                <span className="font-semibold text-ios-text">{data.details.signalLine.toFixed(2)}</span>
                             </div>
                         </div>
                         
-                        <div className="mt-2 p-3 bg-ios-gray6/50 rounded-xl">
+                        <div className="mt-2 p-3 bg-ios-gray6 dark:bg-ios-gray5 rounded-xl border border-transparent dark:border-white/5">
                             <div className="text-[11px] font-semibold text-ios-gray uppercase mb-1">MACD 動能判斷</div>
                             <div className={`font-bold text-[13px] ${data.details.hist > 0 ? 'text-ios-red' : 'text-ios-green'}`}>
                                 {data.details.macd > data.details.signalLine ? '黃金交叉' : '死亡交叉'} / 柱狀線 {data.details.hist > 0 ? '擴大' : '縮小'}
@@ -790,7 +800,7 @@
                  )}
 
                  {activeTab === 'chart' && data.history && (
-                     <div className="animate-slide-up mt-3 pb-2 border-b border-ios-gray6 mb-2">
+                     <div className="animate-slide-up mt-3 pb-2 border-b border-ios-gray5 mb-2">
                          <CandlestickChart data={data.history} />
                      </div>
                  )}
@@ -807,8 +817,24 @@
       const [stocks, setStocks] = useState(() => JSON.parse(localStorage.getItem("myStocks")) || ["2330", "2603"]);
       const [apiKey, setApiKey] = useState(() => localStorage.getItem("gemini_api_key") || "");
       const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+      const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
-      useEffect(() => localStorage.setItem("myStocks", JSON.stringify(stocks)), [stocks]);
+      useEffect(() => {
+        localStorage.setItem("myStocks", JSON.stringify(stocks));
+      }, [stocks]);
+
+      useEffect(() => {
+        localStorage.setItem("theme", theme);
+        if (theme === "dark") {
+          document.body.classList.add("dark");
+        } else {
+          document.body.classList.remove("dark");
+        }
+      }, [theme]);
+
+      const toggleTheme = () => {
+        setTheme(prev => (prev === "dark" ? "light" : "dark"));
+      };
 
       const addStock = (e) => {
         e.preventDefault();
@@ -822,14 +848,22 @@
       return (
         <div className="min-h-screen pb-20">
           {/* iOS Style Navigation Bar */}
-          <div className="sticky top-0 z-20 bg-[#F2F2F7]/90 backdrop-blur-xl border-b border-gray-200/50 pt-safe-top">
+          <div className="sticky top-0 z-20 bg-ios-bg/90 backdrop-blur-xl border-b border-ios-separator/20 pt-safe-top transition-colors duration-300">
             <div className="max-w-md mx-auto px-5 pt-12 pb-2 flex justify-between items-end">
-              <h1 className="text-[34px] font-bold text-black tracking-tight leading-none">
+              <h1 className="text-[34px] font-bold text-ios-text tracking-tight leading-none transition-colors duration-300">
                 阿彬日記
               </h1>
-              <button onClick={() => setIsSettingsOpen(true)} className="w-8 h-8 bg-white rounded-full shadow-sm flex items-center justify-center text-ios-blue mb-1">
-                  <Settings size={20}/>
-              </button>
+              <div className="flex gap-3 mb-1">
+                  <button 
+                    onClick={toggleTheme} 
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-ios-blue active:opacity-70 transition-opacity bg-ios-gray6"
+                  >
+                      {theme === 'dark' ? <Moon size={20}/> : <Sun size={20}/>}
+                  </button>
+                  <button onClick={() => setIsSettingsOpen(true)} className="w-8 h-8 rounded-full flex items-center justify-center text-ios-blue active:opacity-70 transition-opacity bg-ios-gray6">
+                      <Settings size={20}/>
+                  </button>
+              </div>
             </div>
             
             {/* Search Bar */}
@@ -843,7 +877,7 @@
                         value={inputCode}
                         onChange={(e) => setInputCode(e.target.value)}
                         placeholder="搜尋股票代號 (如 2330)"
-                        className="w-full bg-ios-gray5/80 hover:bg-ios-gray5 focus:bg-white text-black text-[17px] rounded-[10px] py-2 pl-9 pr-4 outline-none transition-all placeholder-ios-gray"
+                        className="w-full bg-ios-input hover:bg-opacity-80 focus:bg-ios-card text-ios-text text-[17px] rounded-[10px] py-2 pl-9 pr-4 outline-none transition-all placeholder-ios-gray"
                     />
                 </form>
             </div>
@@ -862,7 +896,7 @@
                     code={code} 
                     onDelete={code => setStocks(s => s.filter(x => x !== code))} 
                     apiKey={apiKey} 
-                    openSettings={() => setIsSettingsOpen(true)} // Add this
+                    openSettings={() => setIsSettingsOpen(true)}
                 />
             ))}
 
