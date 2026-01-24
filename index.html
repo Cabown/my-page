@@ -147,7 +147,6 @@
     <div id="root"></div>
 
     <script type="text/babel">
-    // 新增 useMemo
     const { useState, useEffect, useCallback, useRef, useMemo } = React;
     
     // --- Icons ---
@@ -491,11 +490,16 @@
                                         <span>量能 & MACD</span>
                                         <span className="text-ios-gray">權重 20%</span>
                                     </li>
+                                    <li className="flex justify-between border-t border-gray-200 dark:border-white/10 pt-2 mt-2">
+                                        <span className="text-ios-orange font-medium">特殊型態修正</span>
+                                        <span className="text-ios-gray">動態加減分</span>
+                                    </li>
                                 </ul>
                                 <div className="mt-3 pt-2 border-t border-gray-200 dark:border-white/10 text-[11px] text-ios-subtext leading-relaxed">
                                     綜合計算信心分數 (0-100)：<br/>
                                     • 分數 ≤ 35 <span className="text-ios-blue font-bold">→ 買進訊號</span> (低檔區)<br/>
-                                    • 分數 ≥ 65 <span className="text-ios-red font-bold">→ 賣出訊號</span> (高檔區)
+                                    • 分數 ≥ 65 <span className="text-ios-red font-bold">→ 賣出訊號</span> (高檔區)<br/>
+                                    <span className="text-ios-orange opacity-90 mt-1.5 block font-medium">* 若偵測到「假突破」或「假跌破」，會額外調整分數以捕捉行情轉折點。</span>
                                 </div>
                             </div>
                         </div>
@@ -692,7 +696,6 @@
         );
     };
 
-    // 修改：增加 onSignalUpdate 屬性，用於回報訊號給父層
     const StockCard = ({ code, onDelete, apiKey, openSettings, showToast, onSignalUpdate }) => {
       const [data, setData] = useState(null);
       const [loading, setLoading] = useState(true);
@@ -941,16 +944,18 @@
 
                     {/* The Card */}
                     <div 
-                        className={`w-full max-w-sm rounded-[28px] p-5 relative z-10 animate-scale-in overflow-hidden ${expandedCardStyle}`}
+                        className={`w-full max-w-sm rounded-[28px] p-5 relative z-10 animate-scale-in overflow-y-auto max-h-[85vh] no-scrollbar ${expandedCardStyle}`}
                         onClick={(e) => e.stopPropagation()} // Prevent close on card click
                     >
-                        {/* Close Button (Optional, but good for UX) */}
-                        <button 
-                            onClick={() => setShowModal(false)}
-                            className="absolute top-4 right-4 text-ios-gray hover:text-ios-text p-1 bg-ios-gray6/50 rounded-full"
-                        >
-                            <X size={20}/>
-                        </button>
+                        {/* Close Button with Sticky Positioning and Blur Background */}
+                        <div className="sticky top-0 right-0 z-20 flex justify-end -mt-2 -mr-2 mb-2 pointer-events-none">
+                            <button 
+                                onClick={() => setShowModal(false)}
+                                className="pointer-events-auto text-ios-gray hover:text-ios-text p-1.5 bg-ios-gray6/80 dark:bg-black/20 backdrop-blur-md rounded-full shadow-sm"
+                            >
+                                <X size={20}/>
+                            </button>
+                        </div>
 
                         {/* --- Original Card Content --- */}
                         <div className="flex justify-between items-start mb-1 mt-1">
@@ -1341,9 +1346,5 @@
     </script>
 </body>
 </html>
-
-
-
-
 
 
