@@ -50,7 +50,7 @@
               'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
               'slide-down': 'slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
               'scale-in': 'scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'fade-in': 'fadeIn 0.2s ease-out',
             },
             keyframes: {
               slideUp: {
@@ -62,8 +62,12 @@
                 '100%': { transform: 'translateY(0)', opacity: '1' },
               },
               scaleIn: {
-                '0%': { transform: 'scale(0.95)', opacity: '0' },
+                '0%': { transform: 'scale(0.9)', opacity: '0' },
                 '100%': { transform: 'scale(1)', opacity: '1' },
+              },
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
               }
             }
           }
@@ -143,7 +147,8 @@
     <div id="root"></div>
 
     <script type="text/babel">
-    const { useState, useEffect, useCallback, useRef } = React;
+    // 新增 useMemo
+    const { useState, useEffect, useCallback, useRef, useMemo } = React;
     
     // --- Icons ---
     const Sun = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>);
@@ -165,6 +170,8 @@
     const Upload = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>);
     const CheckCircle = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>);
     const XCircle = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>);
+    const X = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
+    const Info = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>);
 
     // --- Gemini API & Utilities ---
     const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=";
@@ -420,6 +427,146 @@
         );
     };
 
+    const InfoModal = ({ isOpen, onClose }) => {
+        if (!isOpen) return null;
+        
+        return (
+             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] transition-all duration-300">
+                <div className="bg-ios-card rounded-[28px] shadow-ios-modal w-[320px] max-h-[85vh] overflow-hidden animate-scale-in border border-gray-200 dark:border-white/10 relative flex flex-col">
+                     <button 
+                            onClick={onClose}
+                            className="absolute top-4 right-4 text-ios-gray hover:text-ios-text p-1 bg-ios-gray6/50 rounded-full z-10"
+                        >
+                            <X size={20}/>
+                     </button>
+
+                    <div className="p-6 overflow-y-auto no-scrollbar">
+                        <div className="text-center mb-6">
+                            <h3 className="text-[20px] font-bold text-ios-text tracking-tight mb-2">使用指南</h3>
+                            <p className="text-[13px] text-ios-subtext">快速了解介面操作與燈號含義</p>
+                        </div>
+
+                        {/* Signal Legend */}
+                        <div className="mb-6">
+                            <h4 className="text-[12px] font-bold text-ios-gray uppercase mb-3 tracking-wider">訊號燈號解讀</h4>
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-ios-card border border-transparent shadow-[0_0_15px_rgba(0,122,255,0.6)]"></div>
+                                    <div>
+                                        <div className="text-[14px] font-semibold text-ios-text">藍光：買進訊號</div>
+                                        <div className="text-[11px] text-ios-subtext">技術面強勢，可能適合進場</div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-ios-card border border-transparent shadow-[0_0_15px_rgba(255,59,48,0.6)]"></div>
+                                    <div>
+                                        <div className="text-[14px] font-semibold text-ios-text">紅光：賣出訊號</div>
+                                        <div className="text-[11px] text-ios-subtext">技術面過熱或轉弱，注意風險</div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-ios-card border border-gray-200 dark:border-white/10 shadow-sm"></div>
+                                    <div>
+                                        <div className="text-[14px] font-semibold text-ios-text">無光：觀望</div>
+                                        <div className="text-[11px] text-ios-subtext">趨勢不明顯，建議多觀察</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Logic Explanation (NEW) */}
+                        <div className="mb-6">
+                            <h4 className="text-[12px] font-bold text-ios-gray uppercase mb-3 tracking-wider">核心判斷邏輯</h4>
+                            <div className="bg-ios-gray6 dark:bg-white/5 rounded-xl p-3">
+                                <ul className="space-y-2 text-[12px] text-ios-text">
+                                    <li className="flex justify-between">
+                                        <span>RSI 相對強弱</span>
+                                        <span className="text-ios-gray">權重 60%</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>MA20 月線趨勢</span>
+                                        <span className="text-ios-gray">權重 20%</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>量能 & MACD</span>
+                                        <span className="text-ios-gray">權重 20%</span>
+                                    </li>
+                                </ul>
+                                <div className="mt-3 pt-2 border-t border-gray-200 dark:border-white/10 text-[11px] text-ios-subtext leading-relaxed">
+                                    綜合計算信心分數 (0-100)：<br/>
+                                    • 分數 ≤ 35 <span className="text-ios-blue font-bold">→ 買進訊號</span> (低檔區)<br/>
+                                    • 分數 ≥ 65 <span className="text-ios-red font-bold">→ 賣出訊號</span> (高檔區)
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Special Patterns (Added per request) */}
+                        <div className="mb-6">
+                            <h4 className="text-[12px] font-bold text-ios-gray uppercase mb-3 tracking-wider">特殊型態偵測 (加分題)</h4>
+                            <div className="bg-ios-gray6 dark:bg-white/5 rounded-xl p-3 text-[12px] space-y-3">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-ios-orange font-bold">假跌破 (破底翻)</span>
+                                        <span className="bg-ios-blue/20 text-ios-blue text-[10px] px-1.5 py-0.5 rounded">看多 +10%</span>
+                                    </div>
+                                    <p className="text-ios-subtext text-[11px] leading-relaxed">
+                                        盤中跌破支撐，但收盤站回。代表賣壓竭盡，主力低檔承接（洗盤）。
+                                    </p>
+                                </div>
+                                <div className="border-t border-gray-200 dark:border-white/10 pt-3">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-ios-gray font-bold">假突破 (騙線)</span>
+                                        <span className="bg-ios-red/20 text-ios-red text-[10px] px-1.5 py-0.5 rounded">看空 -15%</span>
+                                    </div>
+                                    <p className="text-ios-subtext text-[11px] leading-relaxed">
+                                        盤中突破壓力，但收盤跌回。代表上方解套賣壓沈重，上攻無力（留上影線）。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Features Guide */}
+                        <div className="mb-6">
+                            <h4 className="text-[12px] font-bold text-ios-gray uppercase mb-3 tracking-wider">AI 戰略功能</h4>
+                            <div className="grid grid-cols-2 gap-2 text-[12px]">
+                                <div className="flex items-center gap-1.5 p-2 bg-ios-gray6 dark:bg-white/5 rounded-lg">
+                                    <Sparkles size={14} className="text-ios-blue"/>
+                                    <span className="text-ios-text">新聞摘要</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 p-2 bg-ios-gray6 dark:bg-white/5 rounded-lg">
+                                    <Brain size={14} className="text-ios-blue"/>
+                                    <span className="text-ios-text">AI 診斷</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 p-2 bg-ios-gray6 dark:bg-white/5 rounded-lg">
+                                    <Target size={14} className="text-ios-orange"/>
+                                    <span className="text-ios-text">支撐壓力</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 p-2 bg-ios-gray6 dark:bg-white/5 rounded-lg">
+                                    <ShieldAlert size={14} className="text-ios-purple"/>
+                                    <span className="text-ios-text">風險評估</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Tips */}
+                        <div className="bg-ios-blue/10 rounded-xl p-3 flex gap-3 items-start">
+                             <div className="mt-0.5 text-ios-blue"><Info size={16}/></div>
+                             <p className="text-[12px] text-ios-blue leading-relaxed">
+                                點擊首頁列表中的<strong>「膠囊卡片」</strong>可展開查看詳細 K 線圖與使用完整 AI 功能。
+                             </p>
+                        </div>
+
+                    </div>
+                    <div className="p-4 border-t border-gray-200 dark:border-white/10 mt-auto bg-ios-card">
+                         <button onClick={onClose} className="w-full py-2.5 bg-ios-gray6 dark:bg-white/10 hover:bg-ios-gray5 active:scale-[0.98] transition-all rounded-xl text-[15px] font-semibold text-ios-text">
+                            我知道了
+                         </button>
+                    </div>
+                </div>
+             </div>
+        )
+    }
+
     const SettingsModal = ({ isOpen, onClose, apiKey, setApiKey, stocks, setStocks, showToast }) => {
         const [tempKey, setTempKey] = useState(apiKey);
         const [activeSection, setActiveSection] = useState('api'); // api or data
@@ -545,24 +692,31 @@
         );
     };
 
-    const StockCard = ({ code, onDelete, apiKey, openSettings, showToast }) => {
+    // 修改：增加 onSignalUpdate 屬性，用於回報訊號給父層
+    const StockCard = ({ code, onDelete, apiKey, openSettings, showToast, onSignalUpdate }) => {
       const [data, setData] = useState(null);
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState(null);
-      const [isMock, setIsMock] = useState(false);
       
       const [llmSummary, setLlmSummary] = useState(null);
       const [isLlmLoading, setIsLlmLoading] = useState(false);
       const [strategy, setStrategy] = useState(null);
       const [isStrategyLoading, setIsStrategyLoading] = useState(false);
-      
       const [keyLevels, setKeyLevels] = useState(null);
       const [riskAssessment, setRiskAssessment] = useState(null);
 
       const [activeTab, setActiveTab] = useState('none'); 
+      const [showModal, setShowModal] = useState(false); // 控制彈出卡片
+
+      // 新增：當訊號類型改變時，通知父層組件以便排序
+      useEffect(() => {
+          if (data?.signalType && onSignalUpdate) {
+              onSignalUpdate(code, data.signalType);
+          }
+      }, [data?.signalType, code, onSignalUpdate]);
 
       const fetchData = useCallback(async () => {
-        setLoading(true); setError(null); setIsMock(false);
+        setLoading(true); setError(null);
         try {
           let chartData = null; 
           let stockName = code;
@@ -693,13 +847,24 @@
           }
       };
 
-      if (error) return (
-        <div className="bg-ios-card rounded-[20px] p-4 mb-4 shadow-sm border border-ios-gray6 flex justify-between items-center">
-            <span className="text-ios-red flex items-center gap-2 font-medium"><AlertCircle size={18}/> {code} 暫無資料</span>
-            <button onClick={() => onDelete(code)} className="text-ios-gray4"><Trash2 size={18}/></button>
+      if (loading) return (
+        <div className="bg-ios-card rounded-full p-3 mb-3 shadow-sm flex justify-between items-center h-[60px] animate-pulse">
+            <div className="w-20 h-4 bg-ios-gray5 rounded-full ml-2"></div>
+            <div className="w-16 h-4 bg-ios-gray5 rounded-full mr-2"></div>
         </div>
       );
 
+      if (error) return (
+        <div className="bg-ios-card rounded-full p-3 mb-3 shadow-sm border border-ios-gray6 flex justify-between items-center h-[60px]">
+             <div className="flex items-center gap-2 ml-2">
+                <AlertCircle size={18} className="text-ios-red"/>
+                <span className="font-semibold text-ios-text">{code}</span>
+             </div>
+             <button onClick={() => onDelete(code)} className="mr-2 text-ios-gray4"><Trash2 size={18}/></button>
+        </div>
+      );
+
+      // --- Style Logic ---
       const isUp = data?.change >= 0;
       const colorClass = isUp ? 'text-ios-red' : 'text-ios-green'; 
 
@@ -707,18 +872,26 @@
       if(data?.signalType === 'buy') badgeBg = 'bg-ios-blue/20 text-ios-blue'; 
       if(data?.signalType === 'sell') badgeBg = 'bg-ios-red/20 text-ios-red';
 
-      // 優化：動態計算卡片樣式
-      // 修正：使用雙層陰影 (Layered Shadows) 並移除負擴散，確保圓角處光暈飽滿
-      // Layer 1: 0_0_15px (緊貼的光暈，勾勒輪廓)
-      // Layer 2: 0_0_50px_10px (大範圍氛圍燈，模擬背光)
-      let cardStyle = "bg-ios-card shadow-ios-card border border-transparent"; 
-      
+      // 膠囊狀態的樣式 (改為動態，同步氛圍燈效果)
+      // 預設：普通陰影
+      let capsuleStyle = "bg-ios-card shadow-sm border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 active:scale-[0.98] transition-all cursor-pointer";
+
+      // 增強：大幅提高光暈的不透明度 (0.6 -> 0.8) 與擴散範圍 (Spread +5px)
       if (data?.signalType === 'buy') {
-          // 買進: 強力藍色氛圍
-          cardStyle = "bg-ios-card shadow-[0_10px_40px_-10px_rgba(0,122,255,0.5)] dark:shadow-[0_0_20px_rgba(10,132,255,0.7),0_0_60px_15px_rgba(10,132,255,0.3)] border border-transparent";
+           // 買進: 強力藍色氛圍
+           capsuleStyle = "bg-ios-card shadow-[0_10px_30px_-5px_rgba(0,122,255,0.6)] dark:shadow-[0_0_40px_5px_rgba(10,132,255,0.7)] border border-transparent active:scale-[0.98] transition-all cursor-pointer";
       } else if (data?.signalType === 'sell') {
-          // 賣出: 強力紅色氛圍
-          cardStyle = "bg-ios-card shadow-[0_10px_40px_-10px_rgba(255,59,48,0.5)] dark:shadow-[0_0_20px_rgba(255,69,58,0.7),0_0_60px_15px_rgba(255,69,58,0.3)] border border-transparent";
+           // 賣出: 強力紅色氛圍
+           capsuleStyle = "bg-ios-card shadow-[0_10px_30px_-5px_rgba(255,59,48,0.6)] dark:shadow-[0_0_40px_5px_rgba(255,69,58,0.7)] border border-transparent active:scale-[0.98] transition-all cursor-pointer";
+      }
+
+      // 展開卡片狀態的樣式 (保留 Ambilight)
+      // 增強：雙層光暈，核心層更亮，外層擴散更遠 (100px)
+      let expandedCardStyle = "bg-ios-card shadow-ios-card border border-transparent"; 
+      if (data?.signalType === 'buy') {
+          expandedCardStyle = "bg-ios-card shadow-[0_20px_50px_-5px_rgba(0,122,255,0.6)] dark:shadow-[0_0_40px_rgba(10,132,255,0.9),0_0_100px_20px_rgba(10,132,255,0.5)] border border-transparent";
+      } else if (data?.signalType === 'sell') {
+          expandedCardStyle = "bg-ios-card shadow-[0_20px_50px_-5px_rgba(255,59,48,0.6)] dark:shadow-[0_0_40px_rgba(255,69,58,0.9),0_0_100px_20px_rgba(255,69,58,0.5)] border border-transparent";
       }
 
       const toggleTab = (tab) => {
@@ -726,215 +899,262 @@
           else setActiveTab(tab);
       };
 
+      // 膠囊左側指示燈
+      let indicatorColor = "bg-ios-gray3";
+      if (data?.signalType === 'buy') indicatorColor = "bg-ios-blue shadow-[0_0_8px_rgba(0,122,255,0.6)]";
+      else if (data?.signalType === 'sell') indicatorColor = "bg-ios-red shadow-[0_0_8px_rgba(255,59,48,0.6)]";
+
       return (
-        <div className={`rounded-[22px] p-5 mb-8 animate-slide-up transition-all active:scale-[0.99] duration-300 ${cardStyle}`}>
-          {loading ? (
-            <div className="flex justify-center py-8"><div className="w-6 h-6 border-2 border-ios-gray3 border-t-ios-blue rounded-full animate-spin"></div></div>
-          ) : (
-            <>
-              {/* Header */}
-              <div className="flex justify-between items-start mb-1 relative z-10">
-                <div>
-                  <div className="flex items-baseline gap-2">
-                    <h3 className="text-[22px] font-bold text-ios-text tracking-tight">{data.name}</h3>
-                    <span className="text-[13px] font-semibold text-ios-gray2 bg-ios-gray5 px-1.5 py-0.5 rounded-md">{data.code}</span>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-[13px] font-bold ${badgeBg}`}>
-                  {data.signal}
-                </div>
-              </div>
-
-              {/* Full Width Confidence Bar */}
-              <div className="w-full h-1.5 mb-4 rounded-full overflow-hidden bg-ios-gray5 mt-3">
-                <div 
-                    className={`h-full transition-all duration-700 ease-out rounded-full ${data.signalType === 'buy' ? 'bg-ios-blue' : data.signalType === 'sell' ? 'bg-ios-red' : 'bg-ios-gray3'}`} 
-                    style={{ width: `${data.conf}%` }}
-                ></div>
-              </div>
-
-              {/* Price */}
-              <div className="flex items-baseline gap-3 mb-5">
-                <span className={`text-[34px] font-semibold tracking-tighter ${colorClass}`}>
-                    {data.price.toFixed(2)}
-                </span>
-                <span className={`text-[17px] font-medium ${colorClass}`}>
-                    {isUp ? '▲' : '▼'} {Math.abs(data.change).toFixed(2)}
-                </span>
-              </div>
-
-              {/* Key Stats Row */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-ios-gray6 dark:bg-ios-gray5 rounded-2xl p-3 border border-transparent dark:border-white/5">
-                      <div className="text-[11px] font-semibold text-ios-gray uppercase mb-0.5">RSI 強度</div>
-                      <div className="text-[17px] font-semibold text-ios-text">{data.rsi}</div>
-                  </div>
-                  <div className="bg-ios-gray6 dark:bg-ios-gray5 rounded-2xl p-3 border border-transparent dark:border-white/5">
-                      <div className="text-[11px] font-semibold text-ios-gray uppercase mb-0.5">AI 信心分數</div>
-                      <div className="text-[17px] font-semibold text-ios-text">{data.conf} <span className="text-[11px] font-normal text-ios-gray">/ 100</span></div>
-                  </div>
-              </div>
-
-              {/* Trend Tags */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                  <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${isUp ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400' : 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'}`}>
-                      {isUp ? '趨勢向上' : '趨勢向下'}
-                  </span>
-                  {data.details.hist > 0 ? 
-                    <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400">MACD 多方</span> : 
-                    <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400">MACD 空方</span>
-                  }
-                  {data.details.fb.bull && <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-ios-gray6 text-ios-orange">假跌破</span>}
-                  {data.details.fb.bear && <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-ios-gray6 text-ios-gray">假突破</span>}
-              </div>
-
-              {/* AI Action Buttons Grid */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                  <button 
-                    onClick={() => runAI('news')} disabled={isLlmLoading}
-                    className="flex items-center justify-center gap-1.5 bg-ios-blue/10 active:bg-ios-blue/20 py-2.5 rounded-xl transition-colors hover:bg-ios-blue/20"
-                  >
-                    {isLlmLoading && !isStrategyLoading ? <div className="w-4 h-4 border-2 border-ios-blue/30 border-t-ios-blue rounded-full animate-spin"/> : <Sparkles size={16} className="text-ios-blue"/>}
-                    <span className="text-[13px] font-semibold text-ios-blue">新聞摘要</span>
-                  </button>
-                  <button 
-                    onClick={() => runAI('strategy')} disabled={isStrategyLoading}
-                    className="flex items-center justify-center gap-1.5 bg-ios-blue/10 active:bg-ios-blue/20 py-2.5 rounded-xl transition-colors hover:bg-ios-blue/20"
-                  >
-                    {isStrategyLoading && !isLlmLoading ? <div className="w-4 h-4 border-2 border-ios-blue/30 border-t-ios-blue rounded-full animate-spin"/> : <Brain size={16} className="text-ios-blue"/>}
-                    <span className="text-[13px] font-semibold text-ios-blue">AI 診斷</span>
-                  </button>
-                  <button 
-                    onClick={() => runAI('levels')} disabled={isStrategyLoading}
-                    className="flex items-center justify-center gap-1.5 bg-ios-orange/10 active:bg-ios-orange/20 py-2.5 rounded-xl transition-colors hover:bg-ios-orange/20"
-                  >
-                    <Target size={16} className="text-ios-orange"/>
-                    <span className="text-[13px] font-semibold text-ios-orange">✨ 支撐壓力</span>
-                  </button>
-                  <button 
-                    onClick={() => runAI('risk')} disabled={isStrategyLoading}
-                    className="flex items-center justify-center gap-1.5 bg-ios-purple/10 active:bg-ios-purple/20 py-2.5 rounded-xl transition-colors hover:bg-ios-purple/20"
-                  >
-                    <ShieldAlert size={16} className="text-ios-purple"/>
-                    <span className="text-[13px] font-semibold text-ios-purple">✨ 風險評估</span>
-                  </button>
-              </div>
-
-              {/* AI Result Area */}
-              {(llmSummary || strategy || keyLevels || riskAssessment) && (
-                <div className="mb-4 bg-ios-gray5 rounded-xl p-3.5 animate-slide-up space-y-2 border border-white/5">
-                    {llmSummary && (
-                        <div className="last:mb-0">
-                            <div className="flex items-center gap-1.5 mb-1">
-                                <Sparkles size={12} className="text-ios-gray"/>
-                                <span className="text-[11px] font-bold text-ios-gray uppercase">新聞重點</span>
-                            </div>
-                            <p className="text-[14px] leading-relaxed text-ios-subtext">{llmSummary.text}</p>
-                        </div>
-                    )}
-                    {strategy && (
-                        <div className="last:mb-0 pt-2 border-t border-ios-separator">
-                            <div className="flex items-center gap-1.5 mb-1">
-                                <Brain size={12} className="text-ios-gray"/>
-                                <span className="text-[11px] font-bold text-ios-gray uppercase">策略建議</span>
-                            </div>
-                            <p className="text-[14px] leading-relaxed text-ios-subtext">{strategy}</p>
-                        </div>
-                    )}
-                    {keyLevels && (
-                        <div className="last:mb-0 pt-2 border-t border-ios-separator">
-                            <div className="flex items-center gap-1.5 mb-1">
-                                <Target size={12} className="text-ios-orange"/>
-                                <span className="text-[11px] font-bold text-ios-orange uppercase">關鍵價位</span>
-                            </div>
-                            <p className="text-[14px] leading-relaxed text-ios-subtext font-medium">{keyLevels}</p>
-                        </div>
-                    )}
-                    {riskAssessment && (
-                        <div className="last:mb-0 pt-2 border-t border-ios-separator">
-                            <div className="flex items-center gap-1.5 mb-1">
-                                <ShieldAlert size={12} className="text-ios-purple"/>
-                                <span className="text-[11px] font-bold text-ios-purple uppercase">風險評估</span>
-                            </div>
-                            <p className="text-[14px] leading-relaxed text-ios-subtext font-medium">{riskAssessment}</p>
-                        </div>
-                    )}
-                </div>
-              )}
-
-              {/* Chart/Details Tab */}
-              <div className="mt-4">
-                  <div className="flex bg-ios-gray6 dark:bg-ios-gray5 p-1 rounded-[10px]">
-                      <button 
-                          onClick={() => toggleTab('chart')}
-                          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-[8px] text-[13px] font-medium transition-all ${activeTab === 'chart' ? 'bg-white dark:bg-ios-gray2 text-black dark:text-white shadow-sm' : 'text-ios-gray hover:text-ios-text'}`}
-                      >
-                          <BarChart2 size={14}/> K線圖
-                      </button>
-                      <button 
-                          onClick={() => toggleTab('details')}
-                          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-[8px] text-[13px] font-medium transition-all ${activeTab === 'details' ? 'bg-white dark:bg-ios-gray2 text-black dark:text-white shadow-sm' : 'text-ios-gray hover:text-ios-text'}`}
-                      >
-                          <List size={14}/> 詳細數據
-                      </button>
-                  </div>
-                  
-                  {/* Footer Actions */}
-                  <div className="flex justify-between items-center mt-2 px-1">
-                      <div className="text-[11px] text-ios-gray flex items-center gap-1">
-                          <Clock size={14}/> 資料日期: {new Date().toLocaleDateString()}
-                      </div>
-                      <div className="flex gap-4">
-                          <button onClick={fetchData} className="text-ios-gray hover:text-ios-blue transition-colors flex items-center gap-1 text-[11px] font-medium"><RefreshCw size={12}/> 更新</button>
-                          <button onClick={() => onDelete(code)} className="text-ios-gray hover:text-ios-red transition-colors flex items-center gap-1 text-[11px] font-medium"><Trash2 size={12}/> 移除</button>
-                      </div>
-                  </div>
-
-                  {activeTab === 'details' && data.details && (
-                    <div className="animate-slide-up mt-3 pt-3 border-t border-ios-gray5">
-                        <div className="grid grid-cols-2 gap-4 py-2 text-[13px]">
-                            <div>
-                                <span className="text-ios-gray block mb-0.5">MA20 月線</span>
-                                <span className="font-semibold text-ios-text block">{data.details.ma20.toFixed(2)}</span>
-                                <span className={`text-[11px] font-medium ${data.price > data.details.ma20 ? 'text-ios-red' : 'text-ios-green'}`}>
-                                    {data.price > data.details.ma20 ? '股價在均線上' : '股價在均線下'}
-                                </span>
-                            </div>
-                            <div>
-                                <span className="text-ios-gray block mb-0.5">成交量</span>
-                                <span className={`font-semibold ${data.details.volStrength === 1 ? 'text-ios-red' : 'text-ios-green'}`}>
-                                    {Math.floor(data.details.volume/1000).toLocaleString()}張
-                                </span>
-                            </div>
-                            <div>
-                                <span className="text-ios-gray block mb-0.5">MACD</span>
-                                <span className="font-semibold text-ios-text">{data.details.macd.toFixed(2)}</span>
-                            </div>
-                            <div>
-                                <span className="text-ios-gray block mb-0.5">訊號線 (9EMA)</span>
-                                <span className="font-semibold text-ios-text">{data.details.signalLine.toFixed(2)}</span>
-                            </div>
-                        </div>
-                        
-                        <div className="mt-2 p-3 bg-ios-gray6 dark:bg-ios-gray5 rounded-xl border border-transparent dark:border-white/5">
-                            <div className="text-[11px] font-semibold text-ios-gray uppercase mb-1">MACD 動能判斷</div>
-                            <div className={`font-bold text-[13px] ${data.details.hist > 0 ? 'text-ios-red' : 'text-ios-green'}`}>
-                                {data.details.macd > data.details.signalLine ? '黃金交叉' : '死亡交叉'} / 柱狀線 {data.details.hist > 0 ? '擴大' : '縮小'}
-                            </div>
+        <>
+            {/* 1. 膠囊視圖 (Capsule View) */}
+            <div 
+                onClick={() => setShowModal(true)} 
+                className={`rounded-[30px] p-3 px-5 flex items-center justify-between h-[64px] animate-slide-up ${capsuleStyle}`}
+            >
+                <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${indicatorColor}`}></div>
+                    <div>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-[16px] font-bold text-ios-text tracking-tight">{data.name}</span>
+                            <span className="text-[12px] font-medium text-ios-gray">{data.code}</span>
                         </div>
                     </div>
-                 )}
-
-                 {activeTab === 'chart' && data.history && (
-                     <div className="animate-slide-up mt-3 pb-2 border-b border-ios-gray5 mb-2">
-                         <CandlestickChart data={data.history} />
+                </div>
+                <div className="text-right">
+                     <div className={`text-[16px] font-semibold tracking-tight ${colorClass}`}>
+                        {data.price.toFixed(2)}
                      </div>
-                 )}
-              </div>
+                     <div className={`text-[11px] font-medium ${colorClass}`}>
+                        {isUp ? '+' : ''}{data.change.toFixed(2)}
+                     </div>
+                </div>
+            </div>
 
-            </>
-          )}
-        </div>
+            {/* 2. 展開卡片視圖 (Expanded Modal) */}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-5 animate-fade-in">
+                    {/* Backdrop */}
+                    <div 
+                        className="absolute inset-0 bg-black/40 backdrop-blur-md" 
+                        onClick={() => setShowModal(false)}
+                    ></div>
+
+                    {/* The Card */}
+                    <div 
+                        className={`w-full max-w-sm rounded-[28px] p-5 relative z-10 animate-scale-in overflow-hidden ${expandedCardStyle}`}
+                        onClick={(e) => e.stopPropagation()} // Prevent close on card click
+                    >
+                        {/* Close Button (Optional, but good for UX) */}
+                        <button 
+                            onClick={() => setShowModal(false)}
+                            className="absolute top-4 right-4 text-ios-gray hover:text-ios-text p-1 bg-ios-gray6/50 rounded-full"
+                        >
+                            <X size={20}/>
+                        </button>
+
+                        {/* --- Original Card Content --- */}
+                        <div className="flex justify-between items-start mb-1 mt-1">
+                            <div>
+                            <div className="flex items-baseline gap-2">
+                                <h3 className="text-[22px] font-bold text-ios-text tracking-tight">{data.name}</h3>
+                                <span className="text-[13px] font-semibold text-ios-gray2 bg-ios-gray5 px-1.5 py-0.5 rounded-md">{data.code}</span>
+                            </div>
+                            </div>
+                            <div className={`px-3 py-1 rounded-full text-[13px] font-bold ${badgeBg} mr-8`}>
+                                {data.signal}
+                            </div>
+                        </div>
+
+                        {/* Full Width Confidence Bar */}
+                        <div className="w-full h-1.5 mb-4 rounded-full overflow-hidden bg-ios-gray5 mt-3">
+                            <div 
+                                className={`h-full transition-all duration-700 ease-out rounded-full ${data.signalType === 'buy' ? 'bg-ios-blue' : data.signalType === 'sell' ? 'bg-ios-red' : 'bg-ios-gray3'}`} 
+                                style={{ width: `${data.conf}%` }}
+                            ></div>
+                        </div>
+
+                        {/* Price */}
+                        <div className="flex items-baseline gap-3 mb-5">
+                            <span className={`text-[34px] font-semibold tracking-tighter ${colorClass}`}>
+                                {data.price.toFixed(2)}
+                            </span>
+                            <span className={`text-[17px] font-medium ${colorClass}`}>
+                                {isUp ? '▲' : '▼'} {Math.abs(data.change).toFixed(2)}
+                            </span>
+                        </div>
+
+                        {/* Key Stats Row */}
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                            <div className="bg-ios-gray6 dark:bg-ios-gray5 rounded-2xl p-3 border border-transparent dark:border-white/5">
+                                <div className="text-[11px] font-semibold text-ios-gray uppercase mb-0.5">RSI 強度</div>
+                                <div className="text-[17px] font-semibold text-ios-text">{data.rsi}</div>
+                            </div>
+                            <div className="bg-ios-gray6 dark:bg-ios-gray5 rounded-2xl p-3 border border-transparent dark:border-white/5">
+                                <div className="text-[11px] font-semibold text-ios-gray uppercase mb-0.5">AI 信心分數</div>
+                                <div className="text-[17px] font-semibold text-ios-text">{data.conf} <span className="text-[11px] font-normal text-ios-gray">/ 100</span></div>
+                            </div>
+                        </div>
+
+                        {/* Trend Tags */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${isUp ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400' : 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'}`}>
+                                {isUp ? '趨勢向上' : '趨勢向下'}
+                            </span>
+                            {data.details.hist > 0 ? 
+                                <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400">MACD 多方</span> : 
+                                <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400">MACD 空方</span>
+                            }
+                            {data.details.fb.bull && <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-ios-gray6 text-ios-orange">假跌破</span>}
+                            {data.details.fb.bear && <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-ios-gray6 text-ios-gray">假突破</span>}
+                        </div>
+
+                        {/* AI Action Buttons Grid */}
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                            <button 
+                                onClick={() => runAI('news')} disabled={isLlmLoading}
+                                className="flex items-center justify-center gap-1.5 bg-ios-blue/10 active:bg-ios-blue/20 py-2.5 rounded-xl transition-colors hover:bg-ios-blue/20"
+                            >
+                                {isLlmLoading && !isStrategyLoading ? <div className="w-4 h-4 border-2 border-ios-blue/30 border-t-ios-blue rounded-full animate-spin"/> : <Sparkles size={16} className="text-ios-blue"/>}
+                                <span className="text-[13px] font-semibold text-ios-blue">新聞摘要</span>
+                            </button>
+                            <button 
+                                onClick={() => runAI('strategy')} disabled={isStrategyLoading}
+                                className="flex items-center justify-center gap-1.5 bg-ios-blue/10 active:bg-ios-blue/20 py-2.5 rounded-xl transition-colors hover:bg-ios-blue/20"
+                            >
+                                {isStrategyLoading && !isLlmLoading ? <div className="w-4 h-4 border-2 border-ios-blue/30 border-t-ios-blue rounded-full animate-spin"/> : <Brain size={16} className="text-ios-blue"/>}
+                                <span className="text-[13px] font-semibold text-ios-blue">AI 診斷</span>
+                            </button>
+                            <button 
+                                onClick={() => runAI('levels')} disabled={isStrategyLoading}
+                                className="flex items-center justify-center gap-1.5 bg-ios-orange/10 active:bg-ios-orange/20 py-2.5 rounded-xl transition-colors hover:bg-ios-orange/20"
+                            >
+                                <Target size={16} className="text-ios-orange"/>
+                                <span className="text-[13px] font-semibold text-ios-orange">✨ 支撐壓力</span>
+                            </button>
+                            <button 
+                                onClick={() => runAI('risk')} disabled={isStrategyLoading}
+                                className="flex items-center justify-center gap-1.5 bg-ios-purple/10 active:bg-ios-purple/20 py-2.5 rounded-xl transition-colors hover:bg-ios-purple/20"
+                            >
+                                <ShieldAlert size={16} className="text-ios-purple"/>
+                                <span className="text-[13px] font-semibold text-ios-purple">✨ 風險評估</span>
+                            </button>
+                        </div>
+
+                        {/* AI Result Area */}
+                        {(llmSummary || strategy || keyLevels || riskAssessment) && (
+                            <div className="mb-4 bg-ios-gray5 rounded-xl p-3.5 animate-slide-up space-y-2 border border-white/5">
+                                {llmSummary && (
+                                    <div className="last:mb-0">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <Sparkles size={12} className="text-ios-gray"/>
+                                            <span className="text-[11px] font-bold text-ios-gray uppercase">新聞重點</span>
+                                        </div>
+                                        <p className="text-[14px] leading-relaxed text-ios-subtext">{llmSummary.text}</p>
+                                    </div>
+                                )}
+                                {strategy && (
+                                    <div className="last:mb-0 pt-2 border-t border-ios-separator">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <Brain size={12} className="text-ios-gray"/>
+                                            <span className="text-[11px] font-bold text-ios-gray uppercase">策略建議</span>
+                                        </div>
+                                        <p className="text-[14px] leading-relaxed text-ios-subtext">{strategy}</p>
+                                    </div>
+                                )}
+                                {keyLevels && (
+                                    <div className="last:mb-0 pt-2 border-t border-ios-separator">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <Target size={12} className="text-ios-orange"/>
+                                            <span className="text-[11px] font-bold text-ios-orange uppercase">關鍵價位</span>
+                                        </div>
+                                        <p className="text-[14px] leading-relaxed text-ios-subtext font-medium">{keyLevels}</p>
+                                    </div>
+                                )}
+                                {riskAssessment && (
+                                    <div className="last:mb-0 pt-2 border-t border-ios-separator">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <ShieldAlert size={12} className="text-ios-purple"/>
+                                            <span className="text-[11px] font-bold text-ios-purple uppercase">風險評估</span>
+                                        </div>
+                                        <p className="text-[14px] leading-relaxed text-ios-subtext font-medium">{riskAssessment}</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Chart/Details Tab */}
+                        <div className="mt-4">
+                            <div className="flex bg-ios-gray6 dark:bg-ios-gray5 p-1 rounded-[10px]">
+                                <button 
+                                    onClick={() => toggleTab('chart')}
+                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-[8px] text-[13px] font-medium transition-all ${activeTab === 'chart' ? 'bg-white dark:bg-ios-gray2 text-black dark:text-white shadow-sm' : 'text-ios-gray hover:text-ios-text'}`}
+                                >
+                                    <BarChart2 size={14}/> K線圖
+                                </button>
+                                <button 
+                                    onClick={() => toggleTab('details')}
+                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-[8px] text-[13px] font-medium transition-all ${activeTab === 'details' ? 'bg-white dark:bg-ios-gray2 text-black dark:text-white shadow-sm' : 'text-ios-gray hover:text-ios-text'}`}
+                                >
+                                    <List size={14}/> 詳細數據
+                                </button>
+                            </div>
+                            
+                            {/* Footer Actions */}
+                            <div className="flex justify-between items-center mt-2 px-1">
+                                <div className="text-[11px] text-ios-gray flex items-center gap-1">
+                                    <Clock size={14}/> 資料日期: {new Date().toLocaleDateString()}
+                                </div>
+                                <div className="flex gap-4">
+                                    <button onClick={(e) => { e.stopPropagation(); fetchData(); }} className="text-ios-gray hover:text-ios-blue transition-colors flex items-center gap-1 text-[11px] font-medium"><RefreshCw size={12}/> 更新</button>
+                                    <button onClick={(e) => { e.stopPropagation(); onDelete(code); setShowModal(false); }} className="text-ios-gray hover:text-ios-red transition-colors flex items-center gap-1 text-[11px] font-medium"><Trash2 size={12}/> 移除</button>
+                                </div>
+                            </div>
+
+                            {activeTab === 'details' && data.details && (
+                                <div className="animate-slide-up mt-3 pt-3 border-t border-ios-gray5">
+                                    <div className="grid grid-cols-2 gap-4 py-2 text-[13px]">
+                                        <div>
+                                            <span className="text-ios-gray block mb-0.5">MA20 月線</span>
+                                            <span className="font-semibold text-ios-text block">{data.details.ma20.toFixed(2)}</span>
+                                            <span className={`text-[11px] font-medium ${data.price > data.details.ma20 ? 'text-ios-red' : 'text-ios-green'}`}>
+                                                {data.price > data.details.ma20 ? '股價在均線上' : '股價在均線下'}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className="text-ios-gray block mb-0.5">成交量</span>
+                                            <span className={`font-semibold ${data.details.volStrength === 1 ? 'text-ios-red' : 'text-ios-green'}`}>
+                                                {Math.floor(data.details.volume/1000).toLocaleString()}張
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className="text-ios-gray block mb-0.5">MACD</span>
+                                            <span className="font-semibold text-ios-text">{data.details.macd.toFixed(2)}</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-ios-gray block mb-0.5">訊號線 (9EMA)</span>
+                                            <span className="font-semibold text-ios-text">{data.details.signalLine.toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="mt-2 p-3 bg-ios-gray6 dark:bg-ios-gray5 rounded-xl border border-transparent dark:border-white/5">
+                                        <div className="text-[11px] font-semibold text-ios-gray uppercase mb-1">MACD 動能判斷</div>
+                                        <div className={`font-bold text-[13px] ${data.details.hist > 0 ? 'text-ios-red' : 'text-ios-green'}`}>
+                                            {data.details.macd > data.details.signalLine ? '黃金交叉' : '死亡交叉'} / 柱狀線 {data.details.hist > 0 ? '擴大' : '縮小'}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'chart' && data.history && (
+                                <div className="animate-slide-up mt-3 pb-2 border-b border-ios-gray5 mb-2">
+                                    <CandlestickChart data={data.history} />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
       );
     };
 
@@ -944,8 +1164,12 @@
           const saved = localStorage.getItem("myStocks");
           return saved ? JSON.parse(saved) : ["2330", "2317", "0050"];
       });
+      // 新增：儲存各個股票的訊號狀態，用於排序
+      const [stockSignals, setStockSignals] = useState({});
+
       const [apiKey, setApiKey] = useState(() => localStorage.getItem("gemini_api_key") || "");
       const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+      const [isInfoOpen, setIsInfoOpen] = useState(false);
       const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light"); 
       const [toast, setToast] = useState({ message: '', type: 'success', visible: false });
 
@@ -953,6 +1177,38 @@
           setToast({ message, type, visible: true });
           setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 3000);
       }, []);
+
+      // 新增：更新訊號狀態的 Callback (使用 useCallback 避免不必要的渲染)
+      const handleSignalUpdate = useCallback((code, type) => {
+          setStockSignals(prev => {
+              if (prev[code] === type) return prev; // 如果狀態沒變就不更新
+              return { ...prev, [code]: type };
+          });
+      }, []);
+
+      // 新增：計算排序後的股票清單
+      const sortedStocks = useMemo(() => {
+          return [...stocks].sort((a, b) => {
+              const typeA = stockSignals[a];
+              const typeB = stockSignals[b];
+              
+              // 定義權重：買進/賣出 (2分) > 觀望 (1分) > 未知/載入中 (0分)
+              const getScore = (type) => {
+                  if (type === 'buy' || type === 'sell') return 2;
+                  if (type === 'neutral') return 1;
+                  return 0;
+              };
+
+              const scoreA = getScore(typeA);
+              const scoreB = getScore(typeB);
+
+              // 分數高者排前 (降冪排序)
+              if (scoreA !== scoreB) return scoreB - scoreA;
+              
+              // 分數相同則維持原列表順序 (利用 indexOf)
+              return stocks.indexOf(a) - stocks.indexOf(b);
+          });
+      }, [stocks, stockSignals]);
 
       useEffect(() => {
         localStorage.setItem("myStocks", JSON.stringify(stocks));
@@ -1004,6 +1260,9 @@
                  <button onClick={toggleTheme} className="w-9 h-9 rounded-full bg-ios-gray5 flex items-center justify-center text-ios-text active:scale-95 transition-transform">
                     {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                  </button>
+                  <button onClick={() => setIsInfoOpen(true)} className="w-9 h-9 rounded-full bg-ios-gray5 flex items-center justify-center text-ios-text active:scale-95 transition-transform">
+                    <Info size={20} />
+                 </button>
                  <button onClick={() => setIsSettingsOpen(true)} className={`w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition-transform ${!apiKey ? 'bg-ios-red text-white animate-pulse' : 'bg-ios-gray5 text-ios-text'}`}>
                     <Settings size={20} />
                  </button>
@@ -1031,8 +1290,8 @@
            </div>
 
            {/* Stock List */}
-           <div className="px-4 space-y-4">
-              {stocks.length === 0 ? (
+           <div className="px-4 space-y-5">
+              {sortedStocks.length === 0 ? (
                  <div className="text-center py-20 opacity-50">
                     <div className="w-20 h-20 bg-ios-gray5 rounded-full mx-auto flex items-center justify-center mb-4">
                         <BarChart2 size={32} className="text-ios-gray3"/>
@@ -1041,7 +1300,7 @@
                     <p className="text-ios-gray text-sm mt-1">請上方輸入代號加入</p>
                  </div>
               ) : (
-                 stocks.map(code => (
+                 sortedStocks.map(code => (
                     <StockCard 
                        key={code} 
                        code={code} 
@@ -1049,10 +1308,16 @@
                        apiKey={apiKey}
                        openSettings={() => setIsSettingsOpen(true)}
                        showToast={showToast}
+                       onSignalUpdate={handleSignalUpdate}
                     />
                  ))
               )}
            </div>
+
+           <InfoModal
+              isOpen={isInfoOpen}
+              onClose={() => setIsInfoOpen(false)}
+           />
 
            <SettingsModal 
               isOpen={isSettingsOpen} 
@@ -1076,3 +1341,9 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
