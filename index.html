@@ -114,7 +114,6 @@
         --ios-red: #FF453A;
         --ios-shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.1);
         --ios-shadow-modal: 0 20px 40px rgba(0, 0, 0, 0.6);
-        /* 增強暗黑模式下的光暈強度 */
         --ios-glow-blue: 0 0 30px rgba(10, 132, 255, 0.5);
         --ios-glow-red: 0 0 30px rgba(255, 69, 58, 0.5);
         --ios-chart-grid: #3A3A3C;
@@ -138,7 +137,6 @@
       
       .no-scrollbar::-webkit-scrollbar { display: none; }
       
-      /* Safe Area Spacing */
       .pt-safe-top { padding-top: max(20px, env(safe-area-inset-top)); }
       .pb-safe { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
     </style>
@@ -173,22 +171,7 @@
     const Info = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>);
 
     // --- Gemini API & Utilities ---
-    const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=";
-
-    const fetchWithBackoff = async (url, options, maxRetries = 5) => {
-      for (let attempt = 0; attempt < maxRetries; attempt++) {
-        try {
-          const response = await fetch(url, options);
-          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-          return await response.json();
-        } catch (error) {
-          if (attempt === maxRetries - 1) throw error;
-          const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-      }
-    };
-
+    // ✅ 已經升級為 2026 最新、免費額度最高的 2.5-flash 模型！
     const callGeminiApi = async (userApiKey, userQuery, systemPrompt, useSearch = false) => {
         let finalKey = userApiKey;
         if (!finalKey && typeof API_KEY !== 'undefined') {
@@ -196,32 +179,51 @@
         }
         if (!finalKey) throw new Error("請先設定 Gemini API Key");
         
-        const url = GEMINI_API_URL + finalKey;
+        // 使用 2.5 flash 取代已被停用的 2.0
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
         const payload = {
             contents: [{ parts: [{ text: userQuery }] }],
             systemInstruction: { parts: [{ text: systemPrompt }] },
         };
-        if (useSearch) payload.tools = [{ "google_search": {} }];
+        
+        if (useSearch) payload.tools = [{ "googleSearch": {} }];
 
-        const response = await fetchWithBackoff(url, {
+        const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
 
-        const candidate = response.candidates?.[0];
+        // 加入詳細的白話文錯誤回報機制
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            const errMsg = errData.error?.message || '未知錯誤';
+            
+            if (response.status === 429) {
+                throw new Error("API 額度暫滿 (429)，請稍等 1 分鐘後再試！☕");
+            } else if (response.status === 400) {
+                throw new Error(`設定錯誤 (400): ${errMsg}`);
+            } else if (response.status === 404) {
+                throw new Error(`模型已停用 (404): 請更新程式碼裡的 API 模型名稱`);
+            } else if (response.status === 403) {
+                throw new Error(`權限不足 (403): 請確認 API Key 是否正確`);
+            }
+            throw new Error(`連線失敗 (${response.status}): ${errMsg}`);
+        }
+
+        const data = await response.json();
+        const candidate = data.candidates?.[0];
         if (candidate && candidate.content?.parts?.[0]?.text) {
             const text = candidate.content.parts[0].text;
             let sources = [];
-            const groundingMetadata = candidate.groundingMetadata;
-            if (groundingMetadata && groundingMetadata.groundingAttributions) {
-                sources = groundingMetadata.groundingAttributions
+            if (candidate.groundingMetadata?.groundingAttributions) {
+                sources = candidate.groundingMetadata.groundingAttributions
                     .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
                     .filter(s => s.uri && s.title);
             }
             return { text, sources };
         }
-        throw new Error("Gemini API returned no content.");
+        throw new Error("API 回傳空白內容");
     };
 
     // --- Technical Indicators Logic ---
@@ -709,9 +711,8 @@
       const [riskAssessment, setRiskAssessment] = useState(null);
 
       const [activeTab, setActiveTab] = useState('none'); 
-      const [showModal, setShowModal] = useState(false); // 控制彈出卡片
+      const [showModal, setShowModal] = useState(false); 
 
-      // 新增：當訊號類型改變時，通知父層組件以便排序
       useEffect(() => {
           if (data?.signalType && onSignalUpdate) {
               onSignalUpdate(code, data.signalType);
@@ -867,7 +868,6 @@
         </div>
       );
 
-      // --- Style Logic ---
       const isUp = data?.change >= 0;
       const colorClass = isUp ? 'text-ios-red' : 'text-ios-green'; 
 
@@ -875,21 +875,13 @@
       if(data?.signalType === 'buy') badgeBg = 'bg-ios-blue/20 text-ios-blue'; 
       if(data?.signalType === 'sell') badgeBg = 'bg-ios-red/20 text-ios-red';
 
-      // 膠囊狀態的樣式 (改為動態，同步氛圍燈效果)
-      // 預設：普通陰影
       let capsuleStyle = "bg-ios-card shadow-sm border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 active:scale-[0.98] transition-all cursor-pointer";
-
-      // 增強：大幅提高光暈的不透明度 (0.6 -> 0.8) 與擴散範圍 (Spread +5px)
       if (data?.signalType === 'buy') {
-           // 買進: 強力藍色氛圍
            capsuleStyle = "bg-ios-card shadow-[0_10px_30px_-5px_rgba(0,122,255,0.6)] dark:shadow-[0_0_40px_5px_rgba(10,132,255,0.7)] border border-transparent active:scale-[0.98] transition-all cursor-pointer";
       } else if (data?.signalType === 'sell') {
-           // 賣出: 強力紅色氛圍
            capsuleStyle = "bg-ios-card shadow-[0_10px_30px_-5px_rgba(255,59,48,0.6)] dark:shadow-[0_0_40px_5px_rgba(255,69,58,0.7)] border border-transparent active:scale-[0.98] transition-all cursor-pointer";
       }
 
-      // 展開卡片狀態的樣式 (保留 Ambilight)
-      // 增強：雙層光暈，核心層更亮，外層擴散更遠 (100px)
       let expandedCardStyle = "bg-ios-card shadow-ios-card border border-transparent"; 
       if (data?.signalType === 'buy') {
           expandedCardStyle = "bg-ios-card shadow-[0_20px_50px_-5px_rgba(0,122,255,0.6)] dark:shadow-[0_0_40px_rgba(10,132,255,0.9),0_0_100px_20px_rgba(10,132,255,0.5)] border border-transparent";
@@ -902,14 +894,12 @@
           else setActiveTab(tab);
       };
 
-      // 膠囊左側指示燈
       let indicatorColor = "bg-ios-gray3";
       if (data?.signalType === 'buy') indicatorColor = "bg-ios-blue shadow-[0_0_8px_rgba(0,122,255,0.6)]";
       else if (data?.signalType === 'sell') indicatorColor = "bg-ios-red shadow-[0_0_8px_rgba(255,59,48,0.6)]";
 
       return (
         <>
-            {/* 1. 膠囊視圖 (Capsule View) */}
             <div 
                 onClick={() => setShowModal(true)} 
                 className={`rounded-[30px] p-3 px-5 flex items-center justify-between h-[64px] animate-slide-up ${capsuleStyle}`}
@@ -933,21 +923,17 @@
                 </div>
             </div>
 
-            {/* 2. 展開卡片視圖 (Expanded Modal) */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-5 animate-fade-in">
-                    {/* Backdrop */}
                     <div 
                         className="absolute inset-0 bg-black/40 backdrop-blur-md" 
                         onClick={() => setShowModal(false)}
                     ></div>
 
-                    {/* The Card */}
                     <div 
                         className={`w-full max-w-sm rounded-[28px] p-5 relative z-10 animate-scale-in overflow-y-auto max-h-[85vh] no-scrollbar ${expandedCardStyle}`}
-                        onClick={(e) => e.stopPropagation()} // Prevent close on card click
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        {/* Close Button with Sticky Positioning and Blur Background */}
                         <div className="sticky top-0 right-0 z-20 flex justify-end -mt-2 -mr-2 mb-2 pointer-events-none">
                             <button 
                                 onClick={() => setShowModal(false)}
@@ -957,7 +943,6 @@
                             </button>
                         </div>
 
-                        {/* --- Original Card Content --- */}
                         <div className="flex justify-between items-start mb-1 mt-1">
                             <div>
                             <div className="flex items-baseline gap-2">
@@ -970,7 +955,6 @@
                             </div>
                         </div>
 
-                        {/* Full Width Confidence Bar */}
                         <div className="w-full h-1.5 mb-4 rounded-full overflow-hidden bg-ios-gray5 mt-3">
                             <div 
                                 className={`h-full transition-all duration-700 ease-out rounded-full ${data.signalType === 'buy' ? 'bg-ios-blue' : data.signalType === 'sell' ? 'bg-ios-red' : 'bg-ios-gray3'}`} 
@@ -978,7 +962,6 @@
                             ></div>
                         </div>
 
-                        {/* Price */}
                         <div className="flex items-baseline gap-3 mb-5">
                             <span className={`text-[34px] font-semibold tracking-tighter ${colorClass}`}>
                                 {data.price.toFixed(2)}
@@ -988,7 +971,6 @@
                             </span>
                         </div>
 
-                        {/* Key Stats Row */}
                         <div className="grid grid-cols-2 gap-3 mb-4">
                             <div className="bg-ios-gray6 dark:bg-ios-gray5 rounded-2xl p-3 border border-transparent dark:border-white/5">
                                 <div className="text-[11px] font-semibold text-ios-gray uppercase mb-0.5">RSI 強度</div>
@@ -1000,7 +982,6 @@
                             </div>
                         </div>
 
-                        {/* Trend Tags */}
                         <div className="flex flex-wrap gap-2 mb-4">
                             <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${isUp ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400' : 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'}`}>
                                 {isUp ? '趨勢向上' : '趨勢向下'}
@@ -1013,7 +994,6 @@
                             {data.details.fb.bear && <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-ios-gray6 text-ios-gray">假突破</span>}
                         </div>
 
-                        {/* AI Action Buttons Grid */}
                         <div className="grid grid-cols-2 gap-3 mb-4">
                             <button 
                                 onClick={() => runAI('news')} disabled={isLlmLoading}
@@ -1045,7 +1025,6 @@
                             </button>
                         </div>
 
-                        {/* AI Result Area */}
                         {(llmSummary || strategy || keyLevels || riskAssessment) && (
                             <div className="mb-4 bg-ios-gray5 rounded-xl p-3.5 animate-slide-up space-y-2 border border-white/5">
                                 {llmSummary && (
@@ -1087,7 +1066,6 @@
                             </div>
                         )}
 
-                        {/* Chart/Details Tab */}
                         <div className="mt-4">
                             <div className="flex bg-ios-gray6 dark:bg-ios-gray5 p-1 rounded-[10px]">
                                 <button 
@@ -1104,7 +1082,6 @@
                                 </button>
                             </div>
                             
-                            {/* Footer Actions */}
                             <div className="flex justify-between items-center mt-2 px-1">
                                 <div className="text-[11px] text-ios-gray flex items-center gap-1">
                                     <Clock size={14}/> 資料日期: {new Date().toLocaleDateString()}
@@ -1169,7 +1146,6 @@
           const saved = localStorage.getItem("myStocks");
           return saved ? JSON.parse(saved) : ["2330", "2317", "0050"];
       });
-      // 新增：儲存各個股票的訊號狀態，用於排序
       const [stockSignals, setStockSignals] = useState({});
 
       const [apiKey, setApiKey] = useState(() => localStorage.getItem("gemini_api_key") || "");
@@ -1183,21 +1159,18 @@
           setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 3000);
       }, []);
 
-      // 新增：更新訊號狀態的 Callback (使用 useCallback 避免不必要的渲染)
       const handleSignalUpdate = useCallback((code, type) => {
           setStockSignals(prev => {
-              if (prev[code] === type) return prev; // 如果狀態沒變就不更新
+              if (prev[code] === type) return prev; 
               return { ...prev, [code]: type };
           });
       }, []);
 
-      // 新增：計算排序後的股票清單
       const sortedStocks = useMemo(() => {
           return [...stocks].sort((a, b) => {
               const typeA = stockSignals[a];
               const typeB = stockSignals[b];
               
-              // 定義權重：買進/賣出 (2分) > 觀望 (1分) > 未知/載入中 (0分)
               const getScore = (type) => {
                   if (type === 'buy' || type === 'sell') return 2;
                   if (type === 'neutral') return 1;
@@ -1207,10 +1180,8 @@
               const scoreA = getScore(typeA);
               const scoreB = getScore(typeB);
 
-              // 分數高者排前 (降冪排序)
               if (scoreA !== scoreB) return scoreB - scoreA;
               
-              // 分數相同則維持原列表順序 (利用 indexOf)
               return stocks.indexOf(a) - stocks.indexOf(b);
           });
       }, [stocks, stockSignals]);
@@ -1252,10 +1223,8 @@
 
       return (
         <div className="min-h-screen pb-10 max-w-md mx-auto pt-safe-top">
-           {/* Toast Notification */}
            <Toast message={toast.message} type={toast.type} isVisible={toast.visible} />
 
-           {/* Header */}
            <header className="px-6 py-4 flex justify-between items-center sticky top-0 z-40 bg-ios-bg/80 backdrop-blur-md">
               <div>
                  <h1 className="text-[28px] font-bold text-ios-text tracking-tight">阿彬日記</h1>
@@ -1274,7 +1243,6 @@
               </div>
            </header>
 
-           {/* Input Area */}
            <div className="px-5 mb-6 mt-2">
               <form onSubmit={addStock} className="relative">
                  <input 
@@ -1294,7 +1262,6 @@
               </form>
            </div>
 
-           {/* Stock List */}
            <div className="px-4 space-y-5">
               {sortedStocks.length === 0 ? (
                  <div className="text-center py-20 opacity-50">
@@ -1346,5 +1313,3 @@
     </script>
 </body>
 </html>
-
-
