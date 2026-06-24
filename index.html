@@ -3,260 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>阿彬日記</title>
+    <title>阿彬戰情室 - Apple Pro 級</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
     <script>
       tailwind.config = {
-        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
               sans: ['-apple-system', 'BlinkMacSystemFont', 'San Francisco', 'Helvetica Neue', 'Inter', 'Noto Sans TC', 'sans-serif'],
             },
             colors: {
-              ios: {
-                bg: 'var(--ios-bg)',
-                card: 'var(--ios-card)',
-                text: 'var(--ios-text)',
-                subtext: 'var(--ios-subtext)',
-                blue: '#007AFF', 
-                green: 'var(--ios-green)',
-                red: 'var(--ios-red)',
-                gray: 'var(--ios-gray)',
-                gray2: 'var(--ios-gray2)',
-                gray3: 'var(--ios-gray3)',
-                gray4: 'var(--ios-gray4)',
-                gray5: 'var(--ios-gray5)',
-                gray6: 'var(--ios-gray6)',
-                separator: 'var(--ios-separator)',
-                input: 'var(--ios-input)',
-                orange: '#FF9500',
-                purple: '#AF52DE',
-                indigo: '#5856D6',
+              apple: {
+                bg: '#000000',
+                card: '#151516',
+                border: 'rgba(255, 255, 255, 0.08)',
+                text: '#F5F5F7',
+                subtext: '#86868B',
+                blue: '#0A84FF',
+                orange: '#FF9F0A',
+                purple: '#BF5AF2'
               }
             },
-            boxShadow: {
-              'ios-card': 'var(--ios-shadow-card)',
-              'ios-modal': 'var(--ios-shadow-modal)',
-              'ios-glow-blue': 'var(--ios-glow-blue)',
-              'ios-glow-red': 'var(--ios-glow-red)',
+            backgroundImage: {
+              'gradient-m1': 'linear-gradient(90deg, #A8BFFF 0%, #884DFF 50%, #FF6B8B 100%)',
+              'gradient-green': 'linear-gradient(135deg, #2AF598 0%, #009EFD 100%)',
+              'gradient-red': 'linear-gradient(135deg, #FF6A00 0%, #EE0979 100%)',
+              'gradient-blue': 'linear-gradient(135deg, #5AC8FA 0%, #007AFF 100%)',
+              'gradient-orange': 'linear-gradient(135deg, #FFD3A5 0%, #FD6585 100%)',
             },
             animation: {
-              'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-              'slide-down': 'slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-              'scale-in': 'scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+              'scale-in': 'scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
               'fade-in': 'fadeIn 0.2s ease-out',
+              'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
             },
             keyframes: {
-              slideUp: {
-                '0%': { transform: 'translateY(20px)', opacity: '0' },
-                '100%': { transform: 'translateY(0)', opacity: '1' },
-              },
-              slideDown: {
-                '0%': { transform: 'translateY(-20px)', opacity: '0' },
-                '100%': { transform: 'translateY(0)', opacity: '1' },
-              },
-              scaleIn: {
-                '0%': { transform: 'scale(0.9)', opacity: '0' },
-                '100%': { transform: 'scale(1)', opacity: '1' },
-              },
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              }
+              scaleIn: { '0%': { transform: 'scale(0.95)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } },
+              fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+              slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
             }
           }
         }
       }
     </script>
     <style>
-      :root {
-        --ios-bg: #F2F2F7;
-        --ios-card: #FFFFFF;
-        --ios-text: #000000;
-        --ios-subtext: #8E8E93;
-        --ios-gray: #8E8E93;
-        --ios-gray2: #AEAEB2;
-        --ios-gray3: #C7C7CC;
-        --ios-gray4: #D1D1D6;
-        --ios-gray5: #E5E5EA;
-        --ios-gray6: #f8f7fc; 
-        --ios-separator: #C6C6C8;
-        --ios-input: rgba(118,118,128,0.12);
-        --ios-green: #34C759;
-        --ios-red: #FF3B30;
-        --ios-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-        --ios-shadow-modal: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0,0,0,0.05);
-        --ios-glow-blue: 0 0 15px rgba(0, 122, 255, 0.3);
-        --ios-glow-red: 0 0 15px rgba(255, 59, 48, 0.3);
-        --ios-chart-grid: #E5E5EA;
-      }
-
-      body.dark {
-        --ios-bg: #000000;
-        --ios-card: #1C1C1E;
-        --ios-text: #FFFFFF;
-        --ios-subtext: #EBEBF5;
-        --ios-gray: #98989D;
-        --ios-gray2: #636366;
-        --ios-gray3: #48484A;
-        --ios-gray4: #3A3A3C;
-        --ios-gray5: #2C2C2E;
-        --ios-gray6: #1C1C1E;
-        --ios-separator: #38383A;
-        --ios-input: #2C2C2E;
-        --ios-green: #30D158;
-        --ios-red: #FF453A;
-        --ios-shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.1);
-        --ios-shadow-modal: 0 20px 40px rgba(0, 0, 0, 0.6);
-        --ios-glow-blue: 0 0 30px rgba(10, 132, 255, 0.5);
-        --ios-glow-red: 0 0 30px rgba(255, 69, 58, 0.5);
-        --ios-chart-grid: #3A3A3C;
-      }
-
-      body {
-        -webkit-font-smoothing: antialiased;
-        background-color: var(--ios-bg);
-        color: var(--ios-text);
-        transition: background-color 0.3s ease, color 0.3s ease;
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-      }
-      
-      .ios-input-shadow {
-        box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
-      }
-      body.dark .ios-input-shadow {
-        box-shadow: none;
-      }
-      
+      body { background-color: #000000; color: #F5F5F7; -webkit-font-smoothing: antialiased; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
-      
-      .pt-safe-top { padding-top: max(20px, env(safe-area-inset-top)); }
-      .pb-safe { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+      .bento-card { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease; }
+      .bento-card:hover { transform: scale(1.02); background-color: #1c1c1e; }
+      .text-gradient { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-    const { useState, useEffect, useCallback, useRef, useMemo } = React;
-    
-    // --- Icons ---
-    const Sun = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>);
-    const Moon = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>);
-    const Plus = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>);
-    const Trash2 = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>);
-    const RefreshCw = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.5 15a9 9 0 0 1 14.8-8.2l-2.4 2.3"></path><path d="M20.5 9a9 9 0 0 1-14.8 8.2l2.4-2.3"></path></svg>);
-    const AlertCircle = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>);
-    const Settings = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>);
-    const Key = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>);
-    const BarChart2 = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>);
-    const Sparkles = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z"/></svg>);
+    const { useState, useEffect, useCallback, useMemo } = React;
+
+    // --- 圖示 ---
     const Brain = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 16v-4"></path><path d="M12 8h.01"></path><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>);
-    const ShieldAlert = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>);
-    const Target = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>);
-    const List = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>);
-    const Clock = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>);
-    const Download = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>);
-    const Upload = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>);
-    const CheckCircle = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>);
+    const Sparkles = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z"/></svg>);
     const XCircle = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>);
     const X = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
-    const Info = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>);
+    const Target = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>);
+    const ShieldAlert = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>);
+    const Clock = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>);
+    const RefreshCw = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.5 15a9 9 0 0 1 14.8-8.2l-2.4 2.3"></path><path d="M20.5 9a9 9 0 0 1-14.8 8.2l2.4-2.3"></path></svg>);
+    const Trash2 = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>);
 
-    // --- Gemini API & Utilities ---
+    // --- 真實 API 與技術指標還原 ---
     const callGeminiApi = async (userApiKey, userQuery, systemPrompt, useSearch = false) => {
-        let finalKey = userApiKey;
-        if (!finalKey && typeof API_KEY !== 'undefined') {
-            finalKey = API_KEY;
-        }
+        let finalKey = userApiKey || (typeof API_KEY !== 'undefined' ? API_KEY : null);
         if (!finalKey) throw new Error("請先設定 Gemini API Key");
-        
-        // 💎 已更新至最新、最強的 gemini-2.5-flash 模型
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
-        const payload = {
-            contents: [{ parts: [{ text: userQuery }] }],
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-        };
-        
+        const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
         if (useSearch) payload.tools = [{ "googleSearch": {} }];
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            const errMsg = errData.error?.message || '未知錯誤';
-            
-            if (response.status === 429) {
-                throw new Error("API 額度暫滿 (429)，請稍等 1 分鐘後再試！☕");
-            } else if (response.status === 400) {
-                throw new Error(`設定錯誤 (400): ${errMsg}`);
-            } else if (response.status === 404) {
-                throw new Error(`模型已停用 (404): 請更新程式碼裡的 API 模型名稱`);
-            } else if (response.status === 403) {
-                throw new Error(`權限不足 (403): 請確認 API Key 是否正確`);
-            }
-            throw new Error(`連線失敗 (${response.status}): ${errMsg}`);
-        }
-
+        const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!response.ok) throw new Error("AI API 連線失敗");
         const data = await response.json();
-        const candidate = data.candidates?.[0];
-        if (candidate && candidate.content?.parts?.[0]?.text) {
-            const text = candidate.content.parts[0].text;
-            let sources = [];
-            if (candidate.groundingMetadata?.groundingAttributions) {
-                sources = candidate.groundingMetadata.groundingAttributions
-                    .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
-                    .filter(s => s.uri && s.title);
-            }
-            return { text, sources };
-        }
-        throw new Error("API 回傳空白內容");
+        return { text: data.candidates?.[0]?.content?.parts?.[0]?.text || "" };
     };
 
-    // --- Technical Indicators Logic ---
-    const lastValid = (arr) => {
-      if (!arr || !arr.length) return null;
-      for (let i = arr.length - 1; i >= 0; i--) {
-        if (typeof arr[i] === "number" && !isNaN(arr[i])) return arr[i];
+    const fetchWithProxy = async (targetUrl) => {
+      const proxies = [
+        (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`
+      ];
+      for (const proxyGen of proxies) {
+        try { const res = await fetch(proxyGen(targetUrl)); if (res.ok) return await res.json(); } catch (e) {}
       }
-      return null;
+      throw new Error("All proxies failed");
     };
-    const avgTail = (arr, n) => {
-      const a = arr.slice(-n).filter(x => typeof x === "number" && !isNaN(x));
-      if (!a.length) return 0;
-      return a.reduce((p, c) => p + c, 0) / a.length;
+
+    const fetchStockName = async (code) => {
+      // 1. 內建常見台股與 ETF 字典 (瞬間讀取，絕對不怕被證交所阻擋)
+      const stockNames = {
+        "2330": "台積電", "2317": "鴻海", "0050": "元大台灣50", 
+        "0056": "元大高股息", "2454": "聯發科", "2603": "長榮", 
+        "2382": "廣達", "3231": "緯創", "2303": "聯電", 
+        "2881": "富邦金", "2891": "中信金", "00878": "國泰永續高息",
+        "00919": "群益台灣精選高息", "00929": "復華台灣科技優息",
+        "00940": "元大台灣價值高息", "2308": "台達電"
+      };
+      
+      // 如果代號在字典裡，秒速回傳中文名字
+      if (stockNames[code]) return stockNames[code];
+
+      // 2. 如果是不在字典裡的冷門股，才去證交所 API 抓取
+      try {
+        let data = await fetchWithProxy(`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${code}.tw&json=1&delay=0`);
+        if (data?.msgArray?.[0]?.n) return data.msgArray[0].n;
+        
+        data = await fetchWithProxy(`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=otc_${code}.tw&json=1&delay=0`);
+        return data?.msgArray?.[0]?.n || code;
+      } catch { 
+        // 萬一網路又被擋，安全降級顯示代號
+        return code; 
+      }
     };
+
+    const lastValid = (arr) => { for (let i = arr.length - 1; i >= 0; i--) if (typeof arr[i] === "number" && !isNaN(arr[i])) return arr[i]; return null; };
+    const avgTail = (arr, n) => { const a = arr.slice(-n).filter(x => typeof x === "number" && !isNaN(x)); return a.length ? a.reduce((p, c) => p + c, 0) / a.length : 0; };
     const calcRSI = (closes, len) => {
       if (closes.length < len + 1) return 50;
       let g = 0, l = 0;
-      for (let i = closes.length - (len + 1); i < closes.length - 1; i++) {
-        const d = closes[i + 1] - closes[i];
-        if (d > 0) g += d; else l -= d;
-      }
-      const ag = g / len, al = l / len;
-      const rs = (al === 0) ? 100 : ag / al;
+      for (let i = closes.length - (len + 1); i < closes.length - 1; i++) { const d = closes[i + 1] - closes[i]; if (d > 0) g += d; else l -= d; }
+      const rs = (l === 0) ? 100 : (g / len) / (l / len);
       return 100 - (100 / (1 + rs));
     };
     const emaSeries = (arr, span) => {
       if (arr.length === 0) return [];
       const k = 2 / (span + 1);
-      let e = arr[0];
-      const out = [e];
-      for (let i = 1; i < arr.length; i++) {
-        e = arr[i] * k + e * (1 - k);
-        out.push(e);
-      }
+      let e = arr[0]; const out = [e];
+      for (let i = 1; i < arr.length; i++) { e = arr[i] * k + e * (1 - k); out.push(e); }
       return out;
     };
     const calcMACD = (closes) => {
@@ -265,8 +147,7 @@
       const ema26 = emaSeries(closes, 26);
       const validMacdLine = [];
       for(let i=0; i<closes.length; i++) {
-          if(i < 25) { validMacdLine.push(0); } 
-          else { validMacdLine.push(ema12[i] - (ema26[i] || 0)); }
+          if(i < 25) { validMacdLine.push(0); } else { validMacdLine.push(ema12[i] - (ema26[i] || 0)); }
       }
       const signalLine = emaSeries(validMacdLine, 9);
       const macd = validMacdLine.at(-1);
@@ -276,22 +157,16 @@
     const lastPivotHigh = (highs, lb = 5) => {
       for (let i = highs.length - lb - 1; i >= lb; i--) {
         let ok = true;
-        for (let k = 1; k <= lb; k++) {
-          if (highs[i] <= highs[i - k] || highs[i] <= highs[i + k]) { ok = false; break; }
-        }
+        for (let k = 1; k <= lb; k++) { if (highs[i] <= highs[i - k] || highs[i] <= highs[i + k]) { ok = false; break; } }
         if (ok) return highs[i];
-      }
-      return null;
+      } return null;
     };
     const lastPivotLow = (lows, lb = 5) => {
       for (let i = lows.length - lb - 1; i >= lb; i--) {
         let ok = true;
-        for (let k = 1; k <= lb; k++) {
-          if (lows[i] >= lows[i - k] || lows[i] >= lows[i + k]) { ok = false; break; }
-        }
+        for (let k = 1; k <= lb; k++) { if (lows[i] >= lows[i - k] || lows[i] >= lows[i + k]) { ok = false; break; } }
         if (ok) return lows[i];
-      }
-      return null;
+      } return null;
     };
     const detectFalseBreakout = (highs, lows, closes, vols, tol = 0.001, volMul = 1.2) => {
       const safeMax = highs.slice(-20).length > 0 ? Math.max(...highs.slice(-20)) : 0;
@@ -305,7 +180,7 @@
       return { bear, bull };
     };
 
-    // --- Candlestick Chart ---
+    // --- K線圖元件 (Dark Mode 適配版，支援大版面伸展) ---
     const CandlestickChart = ({ data }) => {
         if (!data || data.closes.length === 0) return null;
         const count = data.closes.length;
@@ -324,18 +199,16 @@
         const plotMin = minPrice - padding;
         const plotRange = plotMax - plotMin;
 
-        const chartW = 300;
-        const chartH = 150;
-        const candleWidth = (chartW / displayCount) * 0.5;
+        const chartW = 600; const chartH = 200;
+        const candleWidth = (chartW / displayCount) * 0.4;
         const spacing = chartW / displayCount;
 
         return (
-            <div className="w-full h-40 mt-2 relative">
+            <div className="w-full h-48 md:h-64 mt-2 relative">
                 <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-full" preserveAspectRatio="none">
                     {[0.2, 0.4, 0.6, 0.8].map(p => (
-                        <line key={p} x1="0" y1={chartH * p} x2={chartW} y2={chartH * p} className="stroke-ios-gray3" strokeWidth="0.5" strokeDasharray="3 3" />
+                        <line key={p} x1="0" y1={chartH * p} x2={chartW} y2={chartH * p} className="stroke-white/10" strokeWidth="0.5" strokeDasharray="4 4" />
                     ))}
-
                     {slicedCloses.map((close, i) => {
                         const open = slicedOpens[i];
                         const high = slicedHighs[i];
@@ -351,968 +224,380 @@
                         
                         return (
                             <g key={i}>
-                                <line x1={x + candleWidth/2} y1={yHigh} x2={x + candleWidth/2} y2={yLow} stroke={displayColor} strokeWidth="1" strokeLinecap="round"/>
+                                <line x1={x + candleWidth/2} y1={yHigh} x2={x + candleWidth/2} y2={yLow} stroke={displayColor} strokeWidth="1.5" strokeLinecap="round"/>
                                 <rect x={x} y={Math.min(yOpen, yClose)} width={candleWidth} height={Math.abs(yClose - yOpen) || 1} fill={displayColor} rx="1" />
                             </g>
                         );
                     })}
                 </svg>
-                <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-between text-[9px] text-ios-gray py-1 pointer-events-none">
-                     <span>{maxPrice.toFixed(0)}</span>
-                     <span>{minPrice.toFixed(0)}</span>
+                <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-between text-[10px] text-gray-500 py-1 pointer-events-none font-bold">
+                     <span>{maxPrice.toFixed(1)}</span>
+                     <span>{minPrice.toFixed(1)}</span>
                 </div>
             </div>
         );
     };
 
-    // --- Mock Data & Networking ---
-    const generateMockData = (code) => {
-      const count = 60;
-      const now = new Date();
-      const timestamps = [];
-      const closes = [], highs = [], lows = [], opens = [], vols = [];
-      let price = (parseInt(code) || 100) % 500 + 50; 
-      if (price < 10) price = 100;
-      for(let i=0; i<count; i++) {
-        const time = new Date(now);
-        time.setDate(now.getDate() - (count - i));
-        timestamps.push(Math.floor(time.getTime() / 1000));
-        const change = (Math.random() - 0.5) * price * 0.05; 
-        const open = price;
-        const close = price + change;
-        const high = Math.max(open, close) + Math.random() * price * 0.02;
-        const low = Math.min(open, close) - Math.random() * price * 0.02;
-        const vol = Math.floor(Math.random() * 5000 + 1000);
-        opens.push(open); closes.push(close); highs.push(high); lows.push(low); vols.push(vol);
-        price = close;
-      }
-      return { chart: { result: [{ meta: { currency: "TWD", symbol: `${code}.TW` }, timestamp: timestamps, indicators: { quote: [{ open: opens, high: highs, low: lows, close: closes, volume: vols }] } }] } };
-    };
+    // --- 獨立股票卡片元件 (帶全新 Bento Grid 彈窗) ---
+    const StockBento = ({ code, onDelete, onSignalUpdate, apiKey }) => {
+        const [data, setData] = useState(null);
+        const [loading, setLoading] = useState(true);
+        const [showModal, setShowModal] = useState(false);
+        const [aiResult, setAiResult] = useState({ news: null, strategy: null, levels: null, risk: null, loading: false });
 
-    // 💡 升級版多重 Proxy 備用機制
-    const fetchWithProxy = async (targetUrl) => {
-      const proxies = [
-        (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-        (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-        (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`
-      ];
-      for (const proxyGen of proxies) {
-        try {
-          const res = await fetch(proxyGen(targetUrl));
-          if (res.ok) return await res.json();
-        } catch (e) { console.warn("Proxy failed", e); }
-      }
-      throw new Error("All proxies failed");
-    };
-
-    const fetchStockName = async (code) => {
-      const tryFetch = async (type) => {
-        try {
-          const url = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${type}_${code}.tw&json=1&delay=0`;
-          const data = await fetchWithProxy(url);
-          if (data.msgArray && data.msgArray[0] && data.msgArray[0].n) return data.msgArray[0].n;
-        } catch (e) { return null; }
-      };
-      let name = await tryFetch('tse');
-      if (!name) name = await tryFetch('otc');
-      return name || code;
-    };
-
-    // --- UI Components ---
-
-    const Toast = ({ message, type, isVisible }) => {
-        if (!isVisible) return null;
-        const isSuccess = type === 'success';
-        return (
-            <div className="fixed top-12 left-1/2 -translate-x-1/2 z-[100] animate-slide-down">
-                <div className="flex items-center gap-2 px-4 py-3 rounded-full shadow-ios-modal bg-white/90 dark:bg-ios-gray5/90 backdrop-blur-md border border-gray-200 dark:border-white/10">
-                    {isSuccess ? <CheckCircle size={18} className="text-ios-green"/> : <XCircle size={18} className="text-ios-red"/>}
-                    <span className="text-[14px] font-medium text-ios-text">{message}</span>
-                </div>
-            </div>
-        );
-    };
-
-    const InfoModal = ({ isOpen, onClose }) => {
-        if (!isOpen) return null;
-        
-        return (
-             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] transition-all duration-300">
-                <div className="bg-ios-card rounded-[28px] shadow-ios-modal w-[320px] max-h-[85vh] overflow-hidden animate-scale-in border border-gray-200 dark:border-white/10 relative flex flex-col">
-                     <button 
-                            onClick={onClose}
-                            className="absolute top-4 right-4 text-ios-gray hover:text-ios-text p-1 bg-ios-gray6/50 rounded-full z-10"
-                        >
-                            <X size={20}/>
-                     </button>
-
-                    <div className="p-6 overflow-y-auto no-scrollbar">
-                        <div className="text-center mb-6">
-                            <h3 className="text-[20px] font-bold text-ios-text tracking-tight mb-2">使用指南</h3>
-                            <p className="text-[13px] text-ios-subtext">快速了解介面操作與燈號含義</p>
-                        </div>
-
-                        {/* Signal Legend */}
-                        <div className="mb-6">
-                            <h4 className="text-[12px] font-bold text-ios-gray uppercase mb-3 tracking-wider">訊號燈號解讀</h4>
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-ios-card border border-transparent shadow-[0_0_15px_rgba(0,122,255,0.6)]"></div>
-                                    <div>
-                                        <div className="text-[14px] font-semibold text-ios-text">藍光：買進訊號</div>
-                                        <div className="text-[11px] text-ios-subtext">技術面強勢，可能適合進場</div>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-ios-card border border-transparent shadow-[0_0_15px_rgba(255,59,48,0.6)]"></div>
-                                    <div>
-                                        <div className="text-[14px] font-semibold text-ios-text">紅光：賣出訊號</div>
-                                        <div className="text-[11px] text-ios-subtext">技術面過熱或轉弱，注意風險</div>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-ios-card border border-gray-200 dark:border-white/10 shadow-sm"></div>
-                                    <div>
-                                        <div className="text-[14px] font-semibold text-ios-text">無光：觀望</div>
-                                        <div className="text-[11px] text-ios-subtext">趨勢不明顯，建議多觀察</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Logic Explanation (NEW) */}
-                        <div className="mb-6">
-                            <h4 className="text-[12px] font-bold text-ios-gray uppercase mb-3 tracking-wider">核心判斷邏輯</h4>
-                            <div className="bg-ios-gray6 dark:bg-white/5 rounded-xl p-3">
-                                <ul className="space-y-2 text-[12px] text-ios-text">
-                                    <li className="flex justify-between">
-                                        <span>RSI 相對強弱</span>
-                                        <span className="text-ios-gray">權重 60%</span>
-                                    </li>
-                                    <li className="flex justify-between">
-                                        <span>MA20 月線趨勢</span>
-                                        <span className="text-ios-gray">權重 20%</span>
-                                    </li>
-                                    <li className="flex justify-between">
-                                        <span>量能 & MACD</span>
-                                        <span className="text-ios-gray">權重 20%</span>
-                                    </li>
-                                    <li className="flex justify-between border-t border-gray-200 dark:border-white/10 pt-2 mt-2">
-                                        <span className="text-ios-orange font-medium">特殊型態修正</span>
-                                        <span className="text-ios-gray">動態加減分</span>
-                                    </li>
-                                </ul>
-                                <div className="mt-3 pt-2 border-t border-gray-200 dark:border-white/10 text-[11px] text-ios-subtext leading-relaxed">
-                                    綜合計算信心分數 (0-100)：<br/>
-                                    • 分數 ≤ 35 <span className="text-ios-blue font-bold">→ 買進訊號</span> (低檔區)<br/>
-                                    • 分數 ≥ 65 <span className="text-ios-red font-bold">→ 賣出訊號</span> (高檔區)<br/>
-                                    <span className="text-ios-orange opacity-90 mt-1.5 block font-medium">* 若偵測到「假突破」或「假跌破」，會額外調整分數以捕捉行情轉折點。</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Special Patterns (Added per request) */}
-                        <div className="mb-6">
-                            <h4 className="text-[12px] font-bold text-ios-gray uppercase mb-3 tracking-wider">特殊型態偵測 (加分題)</h4>
-                            <div className="bg-ios-gray6 dark:bg-white/5 rounded-xl p-3 text-[12px] space-y-3">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-ios-orange font-bold">假跌破 (破底翻)</span>
-                                        <span className="bg-ios-blue/20 text-ios-blue text-[10px] px-1.5 py-0.5 rounded">看多 +10%</span>
-                                    </div>
-                                    <p className="text-ios-subtext text-[11px] leading-relaxed">
-                                        盤中跌破支撐，但收盤站回。代表賣壓竭盡，主力低檔承接（洗盤）。
-                                    </p>
-                                </div>
-                                <div className="border-t border-gray-200 dark:border-white/10 pt-3">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-ios-gray font-bold">假突破 (騙線)</span>
-                                        <span className="bg-ios-red/20 text-ios-red text-[10px] px-1.5 py-0.5 rounded">看空 -15%</span>
-                                    </div>
-                                    <p className="text-ios-subtext text-[11px] leading-relaxed">
-                                        盤中突破壓力，但收盤跌回。代表上方解套賣壓沈重，上攻無力（留上影線）。
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Features Guide */}
-                        <div className="mb-6">
-                            <h4 className="text-[12px] font-bold text-ios-gray uppercase mb-3 tracking-wider">AI 戰略功能</h4>
-                            <div className="grid grid-cols-2 gap-2 text-[12px]">
-                                <div className="flex items-center gap-1.5 p-2 bg-ios-gray6 dark:bg-white/5 rounded-lg">
-                                    <Sparkles size={14} className="text-ios-blue"/>
-                                    <span className="text-ios-text">新聞摘要</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 p-2 bg-ios-gray6 dark:bg-white/5 rounded-lg">
-                                    <Brain size={14} className="text-ios-blue"/>
-                                    <span className="text-ios-text">AI 診斷</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 p-2 bg-ios-gray6 dark:bg-white/5 rounded-lg">
-                                    <Target size={14} className="text-ios-orange"/>
-                                    <span className="text-ios-text">支撐壓力</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 p-2 bg-ios-gray6 dark:bg-white/5 rounded-lg">
-                                    <ShieldAlert size={14} className="text-ios-purple"/>
-                                    <span className="text-ios-text">風險評估</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Tips */}
-                        <div className="bg-ios-blue/10 rounded-xl p-3 flex gap-3 items-start">
-                             <div className="mt-0.5 text-ios-blue"><Info size={16}/></div>
-                             <p className="text-[12px] text-ios-blue leading-relaxed">
-                                點擊首頁列表中的<strong>「膠囊卡片」</strong>可展開查看詳細 K 線圖與使用完整 AI 功能。
-                             </p>
-                        </div>
-
-                    </div>
-                    <div className="p-4 border-t border-gray-200 dark:border-white/10 mt-auto bg-ios-card">
-                         <button onClick={onClose} className="w-full py-2.5 bg-ios-gray6 dark:bg-white/10 hover:bg-ios-gray5 active:scale-[0.98] transition-all rounded-xl text-[15px] font-semibold text-ios-text">
-                            我知道了
-                         </button>
-                    </div>
-                </div>
-             </div>
-        )
-    }
-
-    const SettingsModal = ({ isOpen, onClose, apiKey, setApiKey, stocks, setStocks, showToast }) => {
-        const [tempKey, setTempKey] = useState(apiKey);
-        const [activeSection, setActiveSection] = useState('api'); // api or data
-
-        useEffect(() => setTempKey(apiKey), [apiKey]);
-        
-        const handleSaveKey = () => { 
-            setApiKey(tempKey); 
-            localStorage.setItem("gemini_api_key", tempKey); 
-            showToast('API Key 已儲存', 'success');
-            onClose(); 
-        };
-
-        const handleExport = () => {
-            const data = JSON.stringify(stocks);
-            navigator.clipboard.writeText(data).then(() => {
-                showToast('備份代碼已複製', 'success');
-            }).catch(() => {
-                showToast('複製失敗', 'error');
-            });
-        };
-
-        const handleImport = () => {
-            const input = prompt("請貼上備份代碼 (JSON 格式):");
-            if (input) {
-                try {
-                    const parsed = JSON.parse(input);
-                    if (Array.isArray(parsed)) {
-                        setStocks(parsed);
-                        showToast(`成功還原 ${parsed.length} 檔股票`, 'success');
-                        onClose();
-                    } else {
-                        showToast('格式錯誤: 必須是列表', 'error');
+        const fetchData = useCallback(async () => {
+            setLoading(true);
+            try {
+                let chartData = null;
+                const domains = ['query1.finance.yahoo.com', 'query2.finance.yahoo.com'];
+                for (const domain of domains) {
+                    for (const suffix of ['.TW', '.TWO']) {
+                        try {
+                            const res = await fetchWithProxy(`https://${domain}/v8/finance/chart/${code}${suffix}?interval=1d&range=3mo`);
+                            if (res?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.length > 0) { chartData = res; break; }
+                        } catch(e) {}
                     }
-                } catch (e) {
-                    showToast('無效的備份代碼', 'error');
+                    if (chartData) break;
                 }
-            }
+                if (!chartData) throw new Error("API fail");
+
+                const stockName = await fetchStockName(code);
+                const quote = chartData.chart.result[0].indicators.quote[0];
+                const closes = (quote.close || []).filter(n => typeof n === "number");
+                const opens = (quote.open || []).filter(n => typeof n === "number");
+                const highs = (quote.high || []).filter(n => typeof n === "number");
+                const lows = (quote.low || []).filter(n => typeof n === "number");
+                const vols = (quote.volume || []).filter(n => typeof n === "number");
+
+                const lastClose = lastValid(closes);
+                const volume = lastValid(vols);
+                const rsi14 = calcRSI(closes, 14);
+                const rsi28 = calcRSI(closes, 28);
+                const ma20 = avgTail(closes, 20);
+                const trend = (lastClose >= ma20) ? 1 : -1;
+                const avgV10 = avgTail(vols, 10);
+                const volStrength = (volume > avgV10 * 1.1) ? 1 : -1; 
+                
+                const { macd, signal, hist } = calcMACD(closes);
+                const fb = detectFalseBreakout(highs, lows, closes, vols);
+                
+                const marketTrend = 1;
+                const tech = (rsi14 < 40 && rsi28 < 45) ? 0.2 : (rsi14 > 70 && rsi28 > 65) ? 0.8 : 0.5;
+                let score = (0.6 * tech) + (0.2 * (trend === 1 ? 0.7 : 0.3)) + (0.1 * (volStrength === 1 ? 0.7 : 0.3)) + (0.1 * (marketTrend === 1 ? 0.7 : 0.3));
+                score += (hist > 0 ? +0.05 : -0.05);
+                if (fb.bear) score -= 0.15;
+                if (fb.bull) score += 0.10;
+                score = Math.max(0, Math.min(1, score));
+                
+                const conf = Math.round(score * 100);
+                let signalType = 'neutral';
+                if (score <= 0.35) signalType = 'buy';
+                else if (score >= 0.65) signalType = 'sell';
+
+                setData({
+                    code, name: stockName, price: lastClose,
+                    change: lastClose - closes[closes.length-2],
+                    rsi: rsi14.toFixed(1), conf, signalType,
+                    details: { ma20, hist, macd, signalLine: signal, volume: volume, fb, avgV10, volStrength },
+                    history: { opens, highs, lows, closes }
+                });
+                if(onSignalUpdate) onSignalUpdate(code, signalType);
+            } catch (err) { console.error(err); } finally { setLoading(false); }
+        }, [code, onSignalUpdate]);
+
+        useEffect(() => { fetchData(); }, [fetchData]);
+
+        const runAI = async (type) => {
+            if (!apiKey) return alert("請先在首頁設定輸入 Gemini API Key");
+            setAiResult(prev => ({ ...prev, loading: true }));
+            try {
+                let prompt = "";
+                if (type === 'news') prompt = `簡述 ${data.name} (${data.code}) 近期重大新聞與財報重點 (50字內)。`;
+                if (type === 'strategy') prompt = `基於 ${data.name} 技術面: 收盤${data.price}, RSI ${data.rsi}, MACD ${data.details.hist>0?'多':'空'}, 給出短線操作建議 (50字內)。`;
+                if (type === 'levels') prompt = `根據 ${data.name} 數據：收盤 ${data.price}。預測短線「關鍵支撐」與「關鍵壓力」。範例：支撐 100 / 壓力 110。30字內。`;
+                if (type === 'risk') prompt = `根據 ${data.name}：RSI ${data.rsi}, MACD ${data.details.hist>0?'多':'空'}。評估短線風險等級（低/中/高）並簡述原因。30字內。`;
+                
+                const res = await callGeminiApi(apiKey, prompt, "你是一位專業簡潔的台股分析師", type === 'news');
+                setAiResult(prev => ({ ...prev, [type]: res.text }));
+            } catch (e) { alert(e.message); } finally { setAiResult(prev => ({ ...prev, loading: false })); }
         };
 
-        if (!isOpen) return null;
-
-        return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] transition-all duration-300">
-                <div className="bg-ios-card rounded-[28px] shadow-ios-modal w-[300px] overflow-hidden animate-scale-in border border-gray-200 dark:border-white/10">
-                    <div className="flex border-b border-gray-200 dark:border-white/10">
-                        <button 
-                            onClick={() => setActiveSection('api')}
-                            className={`flex-1 py-3 text-[14px] font-medium transition-colors ${activeSection === 'api' ? 'text-ios-blue bg-ios-gray6 dark:bg-white/5' : 'text-ios-gray hover:text-ios-text'}`}
-                        >
-                            AI 設定
-                        </button>
-                        <button 
-                            onClick={() => setActiveSection('data')}
-                            className={`flex-1 py-3 text-[14px] font-medium transition-colors ${activeSection === 'data' ? 'text-ios-blue bg-ios-gray6 dark:bg-white/5' : 'text-ios-gray hover:text-ios-text'}`}
-                        >
-                            資料管理
-                        </button>
-                    </div>
-
-                    <div className="p-5">
-                        {activeSection === 'api' && (
-                            <div className="text-center animate-slide-up">
-                                <div className="mx-auto w-10 h-10 bg-gradient-to-tr from-ios-blue to-[#5AC8FA] rounded-full flex items-center justify-center mb-3 shadow-lg shadow-blue-500/20">
-                                    <Key size={18} className="text-white"/>
-                                </div>
-                                <h3 className="text-[17px] font-semibold text-ios-text mb-1 tracking-tight">API 設定</h3>
-                                <p className="text-[12px] leading-relaxed text-ios-subtext mb-3">
-                                    輸入 Gemini API Key<br/>啟用 AI 戰略功能
-                                </p>
-                                <input 
-                                    type="password" 
-                                    value={tempKey}
-                                    onChange={(e) => setTempKey(e.target.value)}
-                                    placeholder="sk-..."
-                                    className="w-full px-3 py-2 bg-ios-input border-none rounded-[10px] text-[15px] focus:ring-0 text-center transition-colors placeholder-ios-gray3 text-ios-text ios-input-shadow mb-2"
-                                />
-                                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-ios-blue text-[12px] font-medium inline-block hover:opacity-70">
-                                    取得免費 Key &rarr;
-                                </a>
-                            </div>
-                        )}
-
-                        {activeSection === 'data' && (
-                            <div className="text-center animate-slide-up">
-                                <div className="mx-auto w-10 h-10 bg-gradient-to-tr from-ios-green to-[#34C759] rounded-full flex items-center justify-center mb-3 shadow-lg shadow-green-500/20">
-                                    <List size={18} className="text-white"/>
-                                </div>
-                                <h3 className="text-[17px] font-semibold text-ios-text mb-1 tracking-tight">資料備份</h3>
-                                <p className="text-[12px] leading-relaxed text-ios-subtext mb-4">
-                                    目前追蹤 {stocks.length} 檔股票<br/>備份代碼以防止資料遺失
-                                </p>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <button 
-                                        onClick={handleExport}
-                                        className="flex flex-col items-center justify-center p-3 bg-ios-gray6 dark:bg-ios-gray5 rounded-xl active:scale-95 transition-transform"
-                                    >
-                                        <Download size={20} className="text-ios-blue mb-1"/>
-                                        <span className="text-[12px] font-medium text-ios-text">複製備份</span>
-                                    </button>
-                                    <button 
-                                        onClick={handleImport}
-                                        className="flex flex-col items-center justify-center p-3 bg-ios-gray6 dark:bg-ios-gray5 rounded-xl active:scale-95 transition-transform"
-                                    >
-                                        <Upload size={20} className="text-ios-orange mb-1"/>
-                                        <span className="text-[12px] font-medium text-ios-text">貼上還原</span>
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                    
-                    <div className="grid grid-cols-2 border-t border-gray-200 dark:border-white/10">
-                        <button onClick={onClose} className="py-3 text-[16px] text-ios-gray font-normal border-r border-gray-200 dark:border-white/10 hover:bg-black/5 active:bg-black/10 transition-colors">關閉</button>
-                        {activeSection === 'api' ? (
-                            <button onClick={handleSaveKey} className="py-3 text-[16px] text-ios-blue font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">儲存</button>
-                        ) : (
-                            <div className="py-3 text-[16px] text-ios-gray3 font-semibold cursor-default">---</div>
-                        )}
-                    </div>
-                </div>
+        if (loading || !data) return (
+            <div className="col-span-2 md:col-span-2 xl:col-span-2 bg-apple-card rounded-[32px] border border-apple-border p-6 h-48 animate-pulse flex flex-col justify-between">
+                <div className="h-6 bg-gray-800 rounded w-1/2"></div>
+                <div className="h-10 bg-gray-800 rounded w-3/4"></div>
             </div>
         );
-    };
 
-    const StockCard = ({ code, onDelete, apiKey, openSettings, showToast, onSignalUpdate }) => {
-      const [data, setData] = useState(null);
-      const [loading, setLoading] = useState(true);
-      const [error, setError] = useState(null);
-      
-      const [llmSummary, setLlmSummary] = useState(null);
-      const [isLlmLoading, setIsLlmLoading] = useState(false);
-      const [strategy, setStrategy] = useState(null);
-      const [isStrategyLoading, setIsStrategyLoading] = useState(false);
-      const [keyLevels, setKeyLevels] = useState(null);
-      const [riskAssessment, setRiskAssessment] = useState(null);
+        const isUp = data.change >= 0;
+        const gradientClass = isUp ? 'bg-gradient-red' : 'bg-gradient-green'; 
+        const shadowClass = isUp ? 'drop-shadow-[0_0_15px_rgba(255,106,0,0.4)]' : 'drop-shadow-[0_0_15px_rgba(42,245,152,0.4)]';
+        
+        let signalText = "觀望"; let signalColor = "text-apple-subtext";
+        if (data.signalType === 'buy') { signalText = "買進"; signalColor = "bg-gradient-blue text-gradient font-bold drop-shadow-[0_0_10px_rgba(10,132,255,0.4)]"; }
+        if (data.signalType === 'sell') { signalText = "賣出"; signalColor = "bg-gradient-orange text-gradient font-bold drop-shadow-[0_0_10px_rgba(255,159,10,0.4)]"; }
 
-      const [activeTab, setActiveTab] = useState('none'); 
-      const [showModal, setShowModal] = useState(false); 
-
-      useEffect(() => {
-          if (data?.signalType && onSignalUpdate) {
-              onSignalUpdate(code, data.signalType);
-          }
-      }, [data?.signalType, code, onSignalUpdate]);
-
-      const fetchData = useCallback(async () => {
-        setLoading(true); setError(null);
-        try {
-          let chartData = null; 
-          let stockName = code;
-          
-          // 💡 升級版：自動切換 Yahoo 的 query1 與 query2 伺服器
-          const fetchYahooData = async (suffix) => {
-             const domains = ['query1.finance.yahoo.com', 'query2.finance.yahoo.com'];
-             for (const domain of domains) {
-                 try {
-                     const res = await fetchWithProxy(`https://${domain}/v8/finance/chart/${code}${suffix}?interval=1d&range=3mo`);
-                     if (res && res.chart && res.chart.result && res.chart.result[0].indicators.quote[0].close && res.chart.result[0].indicators.quote[0].close.length > 0) {
-                         return res;
-                     }
-                 } catch(e) { continue; } // 如果這台主機擋連線，自動換下一台
-             }
-             return null;
-          };
-
-          chartData = await fetchYahooData('.TW');
-          if (!chartData) chartData = await fetchYahooData('.TWO');
-          if (!chartData) throw new Error("API fail");
-
-          try {
-            const nameRes = await fetchStockName(code);
-            if (nameRes) stockName = nameRes;
-          } catch (e) { console.log("Name fetch failed"); }
-
-          const result = chartData.chart?.result?.[0];
-          const quote = result.indicators.quote[0];
-          const closes = (quote.close || []).filter(n => typeof n === "number");
-          const opens = (quote.open || []).filter(n => typeof n === "number");
-          const highs = (quote.high || []).filter(n => typeof n === "number");
-          const lows = (quote.low || []).filter(n => typeof n === "number");
-          const vols = (quote.volume || []).filter(n => typeof n === "number");
-
-          if (closes.length < 5) throw new Error("數據不足");
-
-          const lastClose = lastValid(closes);
-          const volume = lastValid(vols);
-          
-          const rsi14 = calcRSI(closes, 14);
-          const rsi28 = calcRSI(closes, 28); 
-          const ma20 = avgTail(closes, 20);
-          const trend = (lastClose >= ma20) ? 1 : -1;
-          const avgV10 = avgTail(vols, 10);
-          const volStrength = (volume > avgV10 * 1.1) ? 1 : -1; 
-
-          const { macd, signal, hist } = calcMACD(closes); 
-          const fb = detectFalseBreakout(highs, lows, closes, vols);
-          
-          const marketTrend = 1; 
-
-          const tech = (rsi14 < 40 && rsi28 < 45) ? 0.2 : (rsi14 > 70 && rsi28 > 65) ? 0.8 : 0.5;
-          let score = (0.6 * tech) +
-                      (0.2 * (trend === 1 ? 0.7 : 0.3)) +
-                      (0.1 * (volStrength === 1 ? 0.7 : 0.3)) +
-                      (0.1 * (marketTrend === 1 ? 0.7 : 0.3));
-
-          score += (hist > 0 ? +0.05 : -0.05);
-          if (fb.bear) score -= 0.15;
-          if (fb.bull) score += 0.10;
-          score = Math.max(0, Math.min(1, score));
-          
-          const conf = Math.round(score * 100);
-          
-          let signalText = "觀望";
-          let signalType = "neutral";
-          if (score <= 0.35) { signalText = "買進區"; signalType = "buy"; }
-          else if (score >= 0.65) { signalText = "賣出區"; signalType = "sell"; }
-
-          setData({
-            name: stockName, code, price: lastClose,
-            change: lastClose - closes[closes.length-2],
-            rsi: rsi14.toFixed(1), conf, signal: signalText, signalType,
-            details: { ma20, hist, macd, signalLine: signal, volume: lastValid(vols), fb, avgV10, volStrength },
-            history: { opens, highs, lows, closes } 
-          });
-        } catch (err) { 
-            console.error(err);
-            const mock = generateMockData(code);
-            setError("無法讀取"); 
-        } 
-        finally { setLoading(false); }
-      }, [code]);
-
-      useEffect(() => { fetchData(); }, [fetchData]);
-      
-      const runAI = async (type) => {
-          if (!apiKey) {
-              openSettings(); 
-              return;
-          }
-          
-          if (type === 'news') { setIsLlmLoading(true); setLlmSummary(null); }
-          else if (type === 'strategy') { setIsStrategyLoading(true); setStrategy(null); }
-          else if (type === 'levels') { setIsStrategyLoading(true); setKeyLevels(null); }
-          else if (type === 'risk') { setIsStrategyLoading(true); setRiskAssessment(null); }
-
-          try {
-              let prompt = "";
-              let system = "你是一位專業簡潔的台股分析師";
-              const isSearch = type === 'news';
-
-              if (type === 'news') {
-                  prompt = `簡述 ${data.name} (${data.code}) 近期重大財經新聞與財報重點 (50字內)。`;
-              } else if (type === 'strategy') {
-                  prompt = `基於 ${data.name} 技術面: 收盤${data.price}, RSI ${data.rsi}, MACD ${data.details.hist>0?'多':'空'}, 給出短線操作建議 (50字內, 勿免責聲明)。`;
-              } else if (type === 'levels') {
-                  const recentHigh = Math.max(...data.history.highs.slice(-20));
-                  const recentLow = Math.min(...data.history.lows.slice(-20));
-                  prompt = `你是台股技術分析師。請根據 ${data.name} (${data.code}) 的數據：收盤價 ${data.price}，近期最高價 ${recentHigh}，近期最低價 ${recentLow}。請預測短線的「關鍵支撐」與「關鍵壓力」價位。回答格式範例：支撐 100.0 / 壓力 110.0。字數 30 字內。`;
-              } else if (type === 'risk') {
-                  const macdStatus = data.details.hist > 0 ? '翻紅(多方)' : '翻綠(空方)';
-                  prompt = `你是風險控管專家。根據 ${data.name} (${data.code}) 數據：RSI ${data.rsi}, MACD ${macdStatus}。請評估短線操作風險等級（低/中/高）並簡述原因。回答範例：風險：高 (RSI過熱)。字數 30 字內。`;
-              }
-              
-              const res = await callGeminiApi(apiKey, prompt, system, isSearch);
-              
-              if (type === 'news') setLlmSummary(res);
-              else if (type === 'strategy') setStrategy(res.text);
-              else if (type === 'levels') setKeyLevels(res.text);
-              else if (type === 'risk') setRiskAssessment(res.text);
-              
-              showToast('AI 分析完成', 'success');
-
-          } catch (e) { 
-              showToast(e.message || 'AI 請求失敗', 'error');
-          } 
-          finally { 
-              setIsLlmLoading(false); 
-              setIsStrategyLoading(false); 
-          }
-      };
-
-      if (loading) return (
-        <div className="bg-ios-card rounded-full p-3 mb-3 shadow-sm flex justify-between items-center h-[60px] animate-pulse">
-            <div className="w-20 h-4 bg-ios-gray5 rounded-full ml-2"></div>
-            <div className="w-16 h-4 bg-ios-gray5 rounded-full mr-2"></div>
-        </div>
-      );
-
-      if (error) return (
-        <div className="bg-ios-card rounded-full p-3 mb-3 shadow-sm border border-ios-gray6 flex justify-between items-center h-[60px]">
-             <div className="flex items-center gap-2 ml-2">
-                <AlertCircle size={18} className="text-ios-red"/>
-                <span className="font-semibold text-ios-text">{code}</span>
-             </div>
-             <button onClick={() => onDelete(code)} className="mr-2 text-ios-gray4"><Trash2 size={18}/></button>
-        </div>
-      );
-
-      const isUp = data?.change >= 0;
-      const colorClass = isUp ? 'text-ios-red' : 'text-ios-green'; 
-
-      let badgeBg = 'bg-ios-gray6 text-ios-gray';
-      if(data?.signalType === 'buy') badgeBg = 'bg-ios-blue/20 text-ios-blue'; 
-      if(data?.signalType === 'sell') badgeBg = 'bg-ios-red/20 text-ios-red';
-
-      let capsuleStyle = "bg-ios-card shadow-sm border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 active:scale-[0.98] transition-all cursor-pointer";
-      if (data?.signalType === 'buy') {
-           capsuleStyle = "bg-ios-card shadow-[0_10px_30px_-5px_rgba(0,122,255,0.6)] dark:shadow-[0_0_40px_5px_rgba(10,132,255,0.7)] border border-transparent active:scale-[0.98] transition-all cursor-pointer";
-      } else if (data?.signalType === 'sell') {
-           capsuleStyle = "bg-ios-card shadow-[0_10px_30px_-5px_rgba(255,59,48,0.6)] dark:shadow-[0_0_40px_5px_rgba(255,69,58,0.7)] border border-transparent active:scale-[0.98] transition-all cursor-pointer";
-      }
-
-      let expandedCardStyle = "bg-ios-card shadow-ios-card border border-transparent"; 
-      if (data?.signalType === 'buy') {
-          expandedCardStyle = "bg-ios-card shadow-[0_20px_50px_-5px_rgba(0,122,255,0.6)] dark:shadow-[0_0_40px_rgba(10,132,255,0.9),0_0_100px_20px_rgba(10,132,255,0.5)] border border-transparent";
-      } else if (data?.signalType === 'sell') {
-          expandedCardStyle = "bg-ios-card shadow-[0_20px_50px_-5px_rgba(255,59,48,0.6)] dark:shadow-[0_0_40px_rgba(255,69,58,0.9),0_0_100px_20px_rgba(255,69,58,0.5)] border border-transparent";
-      }
-
-      const toggleTab = (tab) => {
-          if (activeTab === tab) setActiveTab('none');
-          else setActiveTab(tab);
-      };
-
-      let indicatorColor = "bg-ios-gray3";
-      if (data?.signalType === 'buy') indicatorColor = "bg-ios-blue shadow-[0_0_8px_rgba(0,122,255,0.6)]";
-      else if (data?.signalType === 'sell') indicatorColor = "bg-ios-red shadow-[0_0_8px_rgba(255,59,48,0.6)]";
-
-      return (
-        <>
-            <div 
-                onClick={() => setShowModal(true)} 
-                className={`rounded-[30px] p-3 px-5 flex items-center justify-between h-[64px] animate-slide-up ${capsuleStyle}`}
-            >
-                <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${indicatorColor}`}></div>
-                    <div>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-[16px] font-bold text-ios-text tracking-tight">{data.name}</span>
-                            <span className="text-[12px] font-medium text-ios-gray">{data.code}</span>
+        return (
+            <>
+                {/* 外部面板 (點擊觸發 Dashboard Modal) */}
+                <div onClick={() => setShowModal(true)} className="col-span-2 md:col-span-2 xl:col-span-2 bg-apple-card rounded-[32px] border border-apple-border p-6 flex flex-col justify-between relative overflow-hidden bento-card group cursor-pointer">
+                    <button onClick={(e) => { e.stopPropagation(); onDelete(code); }} className="absolute top-4 right-4 text-gray-600 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <XCircle size={18} />
+                    </button>
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">代號 {data.code}</div>
+                            <div className="text-xl font-bold tracking-tight text-white">{data.name}</div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">RSI 強度</div>
+                            <div className="text-lg font-bold text-white">{data.rsi}</div>
+                        </div>
+                    </div>
+                    <div className="mt-6 flex justify-between items-end">
+                        <div>
+                            <div className={`text-4xl font-black tracking-tighter ${gradientClass} text-gradient ${shadowClass}`}>
+                                {data.price.toFixed(2)}
+                            </div>
+                            <div className={`text-sm font-bold mt-1 ${isUp ? 'text-red-400' : 'text-green-400'}`}>
+                                {isUp ? '▲' : '▼'} {Math.abs(data.change).toFixed(2)}
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">AI 判定</div>
+                            <div className={`text-xl ${signalColor}`}>{signalText}</div>
                         </div>
                     </div>
                 </div>
-                <div className="text-right">
-                     <div className={`text-[16px] font-semibold tracking-tight ${colorClass}`}>
-                        {data.price.toFixed(2)}
-                     </div>
-                     <div className={`text-[11px] font-medium ${colorClass}`}>
-                        {isUp ? '+' : ''}{data.change.toFixed(2)}
-                     </div>
-                </div>
-            </div>
 
-            {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-5 animate-fade-in">
-                    <div 
-                        className="absolute inset-0 bg-black/40 backdrop-blur-md" 
-                        onClick={() => setShowModal(false)}
-                    ></div>
-
-                    <div 
-                        className={`w-full max-w-sm rounded-[28px] p-5 relative z-10 animate-scale-in overflow-y-auto max-h-[85vh] no-scrollbar ${expandedCardStyle}`}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="sticky top-0 right-0 z-20 flex justify-end -mt-2 -mr-2 mb-2 pointer-events-none">
-                            <button 
-                                onClick={() => setShowModal(false)}
-                                className="pointer-events-auto text-ios-gray hover:text-ios-text p-1.5 bg-ios-gray6/80 dark:bg-black/20 backdrop-blur-md rounded-full shadow-sm"
-                            >
-                                <X size={20}/>
-                            </button>
-                        </div>
-
-                        <div className="flex justify-between items-start mb-1 mt-1">
-                            <div>
-                            <div className="flex items-baseline gap-2">
-                                <h3 className="text-[22px] font-bold text-ios-text tracking-tight">{data.name}</h3>
-                                <span className="text-[13px] font-semibold text-ios-gray2 bg-ios-gray5 px-1.5 py-0.5 rounded-md">{data.code}</span>
-                            </div>
-                            </div>
-                            <div className={`px-3 py-1 rounded-full text-[13px] font-bold ${badgeBg} mr-8`}>
-                                {data.signal}
-                            </div>
-                        </div>
-
-                        <div className="w-full h-1.5 mb-4 rounded-full overflow-hidden bg-ios-gray5 mt-3">
-                            <div 
-                                className={`h-full transition-all duration-700 ease-out rounded-full ${data.signalType === 'buy' ? 'bg-ios-blue' : data.signalType === 'sell' ? 'bg-ios-red' : 'bg-ios-gray3'}`} 
-                                style={{ width: `${data.conf}%` }}
-                            ></div>
-                        </div>
-
-                        <div className="flex items-baseline gap-3 mb-5">
-                            <span className={`text-[34px] font-semibold tracking-tighter ${colorClass}`}>
-                                {data.price.toFixed(2)}
-                            </span>
-                            <span className={`text-[17px] font-medium ${colorClass}`}>
-                                {isUp ? '▲' : '▼'} {Math.abs(data.change).toFixed(2)}
-                            </span>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3 mb-4">
-                            <div className="bg-ios-gray6 dark:bg-ios-gray5 rounded-2xl p-3 border border-transparent dark:border-white/5">
-                                <div className="text-[11px] font-semibold text-ios-gray uppercase mb-0.5">RSI 強度</div>
-                                <div className="text-[17px] font-semibold text-ios-text">{data.rsi}</div>
-                            </div>
-                            <div className="bg-ios-gray6 dark:bg-ios-gray5 rounded-2xl p-3 border border-transparent dark:border-white/5">
-                                <div className="text-[11px] font-semibold text-ios-gray uppercase mb-0.5">AI 信心分數</div>
-                                <div className="text-[17px] font-semibold text-ios-text">{data.conf} <span className="text-[11px] font-normal text-ios-gray">/ 100</span></div>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${isUp ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400' : 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'}`}>
-                                {isUp ? '趨勢向上' : '趨勢向下'}
-                            </span>
-                            {data.details.hist > 0 ? 
-                                <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400">MACD 多方</span> : 
-                                <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400">MACD 空方</span>
-                            }
-                            {data.details.fb.bull && <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-ios-gray6 text-ios-orange">假跌破</span>}
-                            {data.details.fb.bear && <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-ios-gray6 text-ios-gray">假突破</span>}
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3 mb-4">
-                            <button 
-                                onClick={() => runAI('news')} disabled={isLlmLoading}
-                                className="flex items-center justify-center gap-1.5 bg-ios-blue/10 active:bg-ios-blue/20 py-2.5 rounded-xl transition-colors hover:bg-ios-blue/20"
-                            >
-                                {isLlmLoading && !isStrategyLoading ? <div className="w-4 h-4 border-2 border-ios-blue/30 border-t-ios-blue rounded-full animate-spin"/> : <Sparkles size={16} className="text-ios-blue"/>}
-                                <span className="text-[13px] font-semibold text-ios-blue">新聞摘要</span>
-                            </button>
-                            <button 
-                                onClick={() => runAI('strategy')} disabled={isStrategyLoading}
-                                className="flex items-center justify-center gap-1.5 bg-ios-blue/10 active:bg-ios-blue/20 py-2.5 rounded-xl transition-colors hover:bg-ios-blue/20"
-                            >
-                                {isStrategyLoading && !isLlmLoading ? <div className="w-4 h-4 border-2 border-ios-blue/30 border-t-ios-blue rounded-full animate-spin"/> : <Brain size={16} className="text-ios-blue"/>}
-                                <span className="text-[13px] font-semibold text-ios-blue">AI 診斷</span>
-                            </button>
-                            <button 
-                                onClick={() => runAI('levels')} disabled={isStrategyLoading}
-                                className="flex items-center justify-center gap-1.5 bg-ios-orange/10 active:bg-ios-orange/20 py-2.5 rounded-xl transition-colors hover:bg-ios-orange/20"
-                            >
-                                <Target size={16} className="text-ios-orange"/>
-                                <span className="text-[13px] font-semibold text-ios-orange">✨ 支撐壓力</span>
-                            </button>
-                            <button 
-                                onClick={() => runAI('risk')} disabled={isStrategyLoading}
-                                className="flex items-center justify-center gap-1.5 bg-ios-purple/10 active:bg-ios-purple/20 py-2.5 rounded-xl transition-colors hover:bg-ios-purple/20"
-                            >
-                                <ShieldAlert size={16} className="text-ios-purple"/>
-                                <span className="text-[13px] font-semibold text-ios-purple">✨ 風險評估</span>
-                            </button>
-                        </div>
-
-                        {(llmSummary || strategy || keyLevels || riskAssessment) && (
-                            <div className="mb-4 bg-ios-gray5 rounded-xl p-3.5 animate-slide-up space-y-2 border border-white/5">
-                                {llmSummary && (
-                                    <div className="last:mb-0">
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <Sparkles size={12} className="text-ios-gray"/>
-                                            <span className="text-[11px] font-bold text-ios-gray uppercase">新聞重點</span>
-                                        </div>
-                                        <p className="text-[14px] leading-relaxed text-ios-subtext">{llmSummary.text}</p>
-                                    </div>
-                                )}
-                                {strategy && (
-                                    <div className="last:mb-0 pt-2 border-t border-ios-separator">
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <Brain size={12} className="text-ios-gray"/>
-                                            <span className="text-[11px] font-bold text-ios-gray uppercase">策略建議</span>
-                                        </div>
-                                        <p className="text-[14px] leading-relaxed text-ios-subtext">{strategy}</p>
-                                    </div>
-                                )}
-                                {keyLevels && (
-                                    <div className="last:mb-0 pt-2 border-t border-ios-separator">
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <Target size={12} className="text-ios-orange"/>
-                                            <span className="text-[11px] font-bold text-ios-orange uppercase">關鍵價位</span>
-                                        </div>
-                                        <p className="text-[14px] leading-relaxed text-ios-subtext font-medium">{keyLevels}</p>
-                                    </div>
-                                )}
-                                {riskAssessment && (
-                                    <div className="last:mb-0 pt-2 border-t border-ios-separator">
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <ShieldAlert size={12} className="text-ios-purple"/>
-                                            <span className="text-[11px] font-bold text-ios-purple uppercase">風險評估</span>
-                                        </div>
-                                        <p className="text-[14px] leading-relaxed text-ios-subtext font-medium">{riskAssessment}</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        <div className="mt-4">
-                            <div className="flex bg-ios-gray6 dark:bg-ios-gray5 p-1 rounded-[10px]">
-                                <button 
-                                    onClick={() => toggleTab('chart')}
-                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-[8px] text-[13px] font-medium transition-all ${activeTab === 'chart' ? 'bg-white dark:bg-ios-gray2 text-black dark:text-white shadow-sm' : 'text-ios-gray hover:text-ios-text'}`}
-                                >
-                                    <BarChart2 size={14}/> K線圖
-                                </button>
-                                <button 
-                                    onClick={() => toggleTab('details')}
-                                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-[8px] text-[13px] font-medium transition-all ${activeTab === 'details' ? 'bg-white dark:bg-ios-gray2 text-black dark:text-white shadow-sm' : 'text-ios-gray hover:text-ios-text'}`}
-                                >
-                                    <List size={14}/> 詳細數據
-                                </button>
-                            </div>
+                {/* --- 終極版：Bento Grid 數據牆 (Dashboard in Dashboard) --- */}
+                {showModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10 animate-fade-in">
+                        {/* 超暗背景與毛玻璃 */}
+                        <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={() => setShowModal(false)}></div>
+                        
+                        {/* 容器 */}
+                        <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar relative z-10 animate-scale-in">
                             
-                            <div className="flex justify-between items-center mt-2 px-1">
-                                <div className="text-[11px] text-ios-gray flex items-center gap-1">
-                                    <Clock size={14}/> 資料日期: {new Date().toLocaleDateString()}
-                                </div>
-                                <div className="flex gap-4">
-                                    <button onClick={(e) => { e.stopPropagation(); fetchData(); }} className="text-ios-gray hover:text-ios-blue transition-colors flex items-center gap-1 text-[11px] font-medium"><RefreshCw size={12}/> 更新</button>
-                                    <button onClick={(e) => { e.stopPropagation(); onDelete(code); setShowModal(false); }} className="text-ios-gray hover:text-ios-red transition-colors flex items-center gap-1 text-[11px] font-medium"><Trash2 size={12}/> 移除</button>
-                                </div>
+                            {/* 關閉按鈕 */}
+                            <div className="sticky top-0 right-0 flex justify-end z-20 mb-4 pointer-events-none">
+                                <button onClick={() => setShowModal(false)} className="pointer-events-auto bg-[#151516] border border-white/10 text-gray-400 hover:text-white p-3 rounded-full shadow-2xl transition-transform active:scale-90">
+                                    <X size={20}/>
+                                </button>
                             </div>
 
-                            {activeTab === 'details' && data.details && (
-                                <div className="animate-slide-up mt-3 pt-3 border-t border-ios-gray5">
-                                    <div className="grid grid-cols-2 gap-4 py-2 text-[13px]">
-                                        <div>
-                                            <span className="text-ios-gray block mb-0.5">MA20 月線</span>
-                                            <span className="font-semibold text-ios-text block">{data.details.ma20.toFixed(2)}</span>
-                                            <span className={`text-[11px] font-medium ${data.price > data.details.ma20 ? 'text-ios-red' : 'text-ios-green'}`}>
-                                                {data.price > data.details.ma20 ? '股價在均線上' : '股價在均線下'}
+                            {/* 內部 Bento Grid */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pb-10">
+                                
+                                {/* 1. Hero 標題與股價 (Span 2 md:Span 4) */}
+                                <div className="col-span-2 md:col-span-4 bg-[#151516] border border-white/5 rounded-[32px] p-8 flex flex-col md:flex-row justify-between items-start md:items-center bento-card relative overflow-hidden">
+                                    {/* 氛圍背景光 */}
+                                    <div className={`absolute top-0 right-0 w-64 h-64 rounded-full mix-blend-screen filter blur-[80px] opacity-20 pointer-events-none ${isUp ? 'bg-red-500' : 'bg-green-500'}`}></div>
+
+                                    <div className="relative z-10">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">{data.name}</h2>
+                                            <span className="bg-white/10 text-white/80 px-3 py-1 rounded-lg text-sm font-bold border border-white/10">{data.code}</span>
+                                        </div>
+                                        <div className="flex items-baseline gap-4 mt-4">
+                                            <span className={`text-[64px] md:text-[80px] leading-none font-black tracking-tighter ${gradientClass} text-gradient ${shadowClass}`}>
+                                                {data.price.toFixed(2)}
                                             </span>
-                                        </div>
-                                        <div>
-                                            <span className="text-ios-gray block mb-0.5">成交量</span>
-                                            <span className={`font-semibold ${data.details.volStrength === 1 ? 'text-ios-red' : 'text-ios-green'}`}>
-                                                {Math.floor(data.details.volume/1000).toLocaleString()}張
+                                            <span className={`text-2xl font-bold ${isUp ? 'text-red-400' : 'text-green-400'}`}>
+                                                {isUp ? '▲' : '▼'} {Math.abs(data.change).toFixed(2)}
                                             </span>
-                                        </div>
-                                        <div>
-                                            <span className="text-ios-gray block mb-0.5">MACD</span>
-                                            <span className="font-semibold text-ios-text">{data.details.macd.toFixed(2)}</span>
-                                        </div>
-                                        <div>
-                                            <span className="text-ios-gray block mb-0.5">訊號線 (9EMA)</span>
-                                            <span className="font-semibold text-ios-text">{data.details.signalLine.toFixed(2)}</span>
                                         </div>
                                     </div>
-                                    
-                                    <div className="mt-2 p-3 bg-ios-gray6 dark:bg-ios-gray5 rounded-xl border border-transparent dark:border-white/5">
-                                        <div className="text-[11px] font-semibold text-ios-gray uppercase mb-1">MACD 動能判斷</div>
-                                        <div className={`font-bold text-[13px] ${data.details.hist > 0 ? 'text-ios-red' : 'text-ios-green'}`}>
+                                    <div className="mt-6 md:mt-0 text-left md:text-right relative z-10">
+                                        <div className="text-[12px] font-bold text-apple-subtext uppercase tracking-widest mb-2">AI 戰略判定</div>
+                                        <div className={`text-4xl md:text-5xl font-black ${signalColor}`}>{signalText}</div>
+                                    </div>
+                                </div>
+
+                                {/* 2. RSI 強度 */}
+                                <div className="col-span-1 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center items-center bento-card text-center">
+                                    <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-2">RSI (14)</div>
+                                    <div className="text-4xl font-black text-white">{data.rsi}</div>
+                                </div>
+
+                                {/* 3. AI 信心分數 */}
+                                <div className="col-span-1 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center items-center bento-card text-center">
+                                    <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-2">AI Conf.</div>
+                                    <div className="text-4xl font-black text-white">{data.conf}</div>
+                                </div>
+
+                                {/* 4. MA20 月線 */}
+                                <div className="col-span-1 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center items-center bento-card text-center">
+                                    <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-2">MA20 月線</div>
+                                    <div className="text-3xl font-bold text-white">{data.details.ma20.toFixed(2)}</div>
+                                    <div className={`text-[11px] mt-2 font-bold px-2 py-0.5 rounded-full ${data.price > data.details.ma20 ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                                        {data.price > data.details.ma20 ? '站上月線' : '跌破月線'}
+                                    </div>
+                                </div>
+
+                                {/* 5. 成交量 */}
+                                <div className="col-span-1 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center items-center bento-card text-center">
+                                    <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-2">Volume</div>
+                                    <div className={`text-3xl font-bold ${data.details.volStrength === 1 ? 'text-red-400' : 'text-green-400'}`}>
+                                        {Math.floor(data.details.volume/1000)}k
+                                    </div>
+                                </div>
+
+                                {/* 6. 滿版 K 線圖 (Span 2 md:Span 4) */}
+                                <div className="col-span-2 md:col-span-4 bg-[#151516] border border-white/5 rounded-[32px] p-6 md:p-8 bento-card">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <div className="text-[12px] font-bold text-apple-subtext uppercase tracking-widest">K-Line Chart</div>
+                                        <button onClick={(e) => { e.stopPropagation(); fetchData(); }} className="text-apple-subtext hover:text-white flex items-center gap-1.5 text-xs font-bold transition-colors">
+                                            <RefreshCw size={14}/> Refresh
+                                        </button>
+                                    </div>
+                                    <CandlestickChart data={data.history} />
+                                </div>
+
+                                {/* 7. MACD 詳細數據 (Span 2) */}
+                                <div className="col-span-2 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center bento-card">
+                                    <div className="flex justify-between items-center mb-5">
+                                        <div className="text-[12px] font-bold text-apple-subtext uppercase tracking-widest">MACD Indicator</div>
+                                        <div className={`text-xs font-bold px-3 py-1 rounded-full ${data.details.hist > 0 ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
                                             {data.details.macd > data.details.signalLine ? '黃金交叉' : '死亡交叉'} / 柱狀線 {data.details.hist > 0 ? '擴大' : '縮小'}
                                         </div>
                                     </div>
+                                    <div className="flex justify-between items-end">
+                                        <div>
+                                            <div className="text-[11px] text-gray-500 mb-1 uppercase font-bold">DIF (MACD)</div>
+                                            <div className="text-2xl font-bold text-white">{data.details.macd.toFixed(2)}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-[11px] text-gray-500 mb-1 uppercase font-bold">9EMA (Signal)</div>
+                                            <div className="text-2xl font-bold text-white">{data.details.signalLine.toFixed(2)}</div>
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
 
-                            {activeTab === 'chart' && data.history && (
-                                <div className="animate-slide-up mt-3 pb-2 border-b border-ios-gray5 mb-2">
-                                    <CandlestickChart data={data.history} />
+                                {/* 8. 操作與標籤 (Span 2) */}
+                                <div className="col-span-2 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center bento-card text-center gap-3">
+                                    <div className="text-[12px] font-bold text-apple-subtext uppercase tracking-widest mb-1 text-left">Quick Actions</div>
+                                    <div className="grid grid-cols-2 gap-3 h-full">
+                                        <div className="flex flex-col items-center justify-center gap-2 bg-white/5 rounded-2xl p-4 border border-white/5">
+                                            <Clock size={20} className="text-gray-400"/>
+                                            <span className="text-xs font-bold text-gray-400">{new Date().toLocaleDateString()}</span>
+                                        </div>
+                                        <button onClick={(e) => { e.stopPropagation(); onDelete(code); setShowModal(false); }} className="flex flex-col items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 rounded-2xl p-4 transition-colors border border-red-500/10">
+                                            <Trash2 size={20} className="text-red-400"/>
+                                            <span className="text-xs font-bold text-red-400">刪除監控</span>
+                                        </button>
+                                    </div>
                                 </div>
-                            )}
+
+                                {/* 9. AI 戰略執行按鈕 (Span 2 md:Span 4) */}
+                                <div className="col-span-2 md:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <button onClick={() => runAI('news')} disabled={aiResult.loading} className="bg-[#151516] border border-blue-500/20 hover:bg-blue-500/10 rounded-[24px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card">
+                                        <Sparkles size={24} className="text-blue-400"/>
+                                        <span className="text-sm font-bold text-blue-400">新聞摘要</span>
+                                    </button>
+                                    <button onClick={() => runAI('strategy')} disabled={aiResult.loading} className="bg-[#151516] border border-blue-500/20 hover:bg-blue-500/10 rounded-[24px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card">
+                                        <Brain size={24} className="text-blue-400"/>
+                                        <span className="text-sm font-bold text-blue-400">AI 診斷</span>
+                                    </button>
+                                    <button onClick={() => runAI('levels')} disabled={aiResult.loading} className="bg-[#151516] border border-orange-500/20 hover:bg-orange-500/10 rounded-[24px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card">
+                                        <Target size={24} className="text-orange-400"/>
+                                        <span className="text-sm font-bold text-orange-400">支撐壓力</span>
+                                    </button>
+                                    <button onClick={() => runAI('risk')} disabled={aiResult.loading} className="bg-[#151516] border border-purple-500/20 hover:bg-purple-500/10 rounded-[24px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card">
+                                        <ShieldAlert size={24} className="text-purple-400"/>
+                                        <span className="text-sm font-bold text-purple-400">風險評估</span>
+                                    </button>
+                                </div>
+
+                                {/* 10. AI 輸出結果牆 (有內容時才顯示) */}
+                                {(aiResult.news || aiResult.strategy || aiResult.levels || aiResult.risk) && (
+                                    <div className="col-span-2 md:col-span-4 bg-[#151516] border border-white/5 rounded-[32px] p-6 md:p-8 bento-card animate-slide-up space-y-6">
+                                        {aiResult.news && (
+                                            <div><div className="text-[12px] font-bold text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Sparkles size={16}/> 新聞重點</div><p className="text-[15px] text-gray-300 leading-relaxed font-medium">{aiResult.news}</p></div>
+                                        )}
+                                        {aiResult.strategy && (
+                                            <div className={aiResult.news ? "pt-4 border-t border-white/10" : ""}><div className="text-[12px] font-bold text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Brain size={16}/> 策略建議</div><p className="text-[15px] text-gray-300 leading-relaxed font-medium">{aiResult.strategy}</p></div>
+                                        )}
+                                        {aiResult.levels && (
+                                            <div className={(aiResult.news || aiResult.strategy) ? "pt-4 border-t border-white/10" : ""}><div className="text-[12px] font-bold text-orange-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Target size={16}/> 關鍵價位</div><p className="text-[15px] text-gray-300 font-medium">{aiResult.levels}</p></div>
+                                        )}
+                                        {aiResult.risk && (
+                                            <div className={(aiResult.news || aiResult.strategy || aiResult.levels) ? "pt-4 border-t border-white/10" : ""}><div className="text-[12px] font-bold text-purple-400 uppercase tracking-widest mb-2 flex items-center gap-2"><ShieldAlert size={16}/> 風險評估</div><p className="text-[15px] text-gray-300 font-medium">{aiResult.risk}</p></div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </>
-      );
+                )}
+            </>
+        );
     };
 
     const App = () => {
       const [inputCode, setInputCode] = useState("");
-      const [stocks, setStocks] = useState(() => {
-          const saved = localStorage.getItem("myStocks");
-          return saved ? JSON.parse(saved) : ["2330", "2317", "0050"];
-      });
+      const [stocks, setStocks] = useState(["2330", "2317", "0050", "2454"]);
       const [stockSignals, setStockSignals] = useState({});
-
       const [apiKey, setApiKey] = useState(() => localStorage.getItem("gemini_api_key") || "");
-      const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-      const [isInfoOpen, setIsInfoOpen] = useState(false);
-      const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light"); 
-      const [toast, setToast] = useState({ message: '', type: 'success', visible: false });
 
-      const showToast = useCallback((message, type = 'success') => {
-          setToast({ message, type, visible: true });
-          setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 3000);
-      }, []);
+      const handleSignalUpdate = useCallback((code, type) => { setStockSignals(prev => ({ ...prev, [code]: type })); }, []);
+      const removeStock = (code) => { setStocks(prev => prev.filter(s => s !== code)); };
 
-      const handleSignalUpdate = useCallback((code, type) => {
-          setStockSignals(prev => {
-              if (prev[code] === type) return prev; 
-              return { ...prev, [code]: type };
-          });
-      }, []);
-
-      const sortedStocks = useMemo(() => {
-          return [...stocks].sort((a, b) => {
-              const typeA = stockSignals[a];
-              const typeB = stockSignals[b];
-              
-              const getScore = (type) => {
-                  if (type === 'buy' || type === 'sell') return 2;
-                  if (type === 'neutral') return 1;
-                  return 0;
-              };
-
-              const scoreA = getScore(typeA);
-              const scoreB = getScore(typeB);
-
-              if (scoreA !== scoreB) return scoreB - scoreA;
-              
-              return stocks.indexOf(a) - stocks.indexOf(b);
-          });
+      const stats = useMemo(() => {
+          let buyCount = 0; let sellCount = 0;
+          Object.values(stockSignals).forEach(sig => { if (sig === 'buy') buyCount++; if (sig === 'sell') sellCount++; });
+          return { total: stocks.length, buyCount, sellCount };
       }, [stocks, stockSignals]);
 
-      useEffect(() => {
-        localStorage.setItem("myStocks", JSON.stringify(stocks));
-      }, [stocks]);
-
-      useEffect(() => {
-        const root = window.document.body;
-        if (theme === 'dark') {
-          root.classList.add('dark');
-        } else {
-          root.classList.remove('dark');
-        }
-        localStorage.setItem("theme", theme);
-      }, [theme]);
-
-      const toggleTheme = () => {
-        setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-      };
-
-      const addStock = (e) => {
-        e.preventDefault();
-        const code = inputCode.trim();
-        if (code && !stocks.includes(code)) {
-          setStocks(prev => [code, ...prev]);
-          setInputCode("");
-          showToast(`已加入 ${code}`, 'success');
-        } else if (stocks.includes(code)) {
-            showToast(`${code} 已經在清單中`, 'error');
-        }
-      };
-
-      const removeStock = (code) => {
-        setStocks(prev => prev.filter(s => s !== code));
-        showToast(`已移除 ${code}`, 'success');
-      };
-
       return (
-        <div className="min-h-screen pb-10 max-w-md mx-auto pt-safe-top">
-           <Toast message={toast.message} type={toast.type} isVisible={toast.visible} />
-
-           <header className="px-6 py-4 flex justify-between items-center sticky top-0 z-40 bg-ios-bg/80 backdrop-blur-md">
-              <div>
-                 <h1 className="text-[28px] font-bold text-ios-text tracking-tight">阿彬日記</h1>
-                 <p className="text-[13px] text-ios-subtext font-medium">台股 AI 戰略觀察</p>
-              </div>
-              <div className="flex gap-3">
-                 <button onClick={toggleTheme} className="w-9 h-9 rounded-full bg-ios-gray5 flex items-center justify-center text-ios-text active:scale-95 transition-transform">
-                    {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                 </button>
-                  <button onClick={() => setIsInfoOpen(true)} className="w-9 h-9 rounded-full bg-ios-gray5 flex items-center justify-center text-ios-text active:scale-95 transition-transform">
-                    <Info size={20} />
-                 </button>
-                 <button onClick={() => setIsSettingsOpen(true)} className={`w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition-transform ${!apiKey ? 'bg-ios-red text-white animate-pulse' : 'bg-ios-gray5 text-ios-text'}`}>
-                    <Settings size={20} />
-                 </button>
-              </div>
-           </header>
-
-           <div className="px-5 mb-6 mt-2">
-              <form onSubmit={addStock} className="relative">
-                 <input 
-                    type="text" 
-                    value={inputCode}
-                    onChange={(e) => setInputCode(e.target.value)}
-                    placeholder="輸入股票代號 (例如: 2330)"
-                    className="w-full bg-ios-card h-12 rounded-[14px] pl-4 pr-12 text-[17px] shadow-sm focus:outline-none focus:ring-2 focus:ring-ios-blue/50 transition-all text-ios-text placeholder-ios-gray3"
-                 />
-                 <button 
-                    type="submit"
-                    disabled={!inputCode}
-                    className="absolute right-2 top-2 bottom-2 w-8 h-8 bg-ios-blue rounded-[10px] flex items-center justify-center text-white disabled:opacity-50 disabled:bg-ios-gray4 transition-all active:scale-90"
-                 >
-                    <Plus size={20} strokeWidth={3} />
-                 </button>
-              </form>
-           </div>
-
-           <div className="px-4 space-y-5">
-              {sortedStocks.length === 0 ? (
-                 <div className="text-center py-20 opacity-50">
-                    <div className="w-20 h-20 bg-ios-gray5 rounded-full mx-auto flex items-center justify-center mb-4">
-                        <BarChart2 size={32} className="text-ios-gray3"/>
+        <div className="min-h-screen bg-apple-bg p-4 md:p-10 font-sans">
+            <div className="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-4 md:gap-6">
+                
+                <div className="col-span-2 md:col-span-4 xl:col-span-4 row-span-2 bg-apple-card rounded-[32px] border border-apple-border p-8 relative flex flex-col justify-center items-center overflow-hidden bento-card">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-600 rounded-full mix-blend-screen filter blur-[80px] opacity-40"></div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-blue-500 rounded-full mix-blend-screen filter blur-[60px] opacity-30"></div>
+                    <div className="relative z-10 text-center">
+                        <Brain size={48} className="mx-auto text-white mb-4 opacity-90"/>
+                        <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white mb-2">阿彬<span className="bg-gradient-m1 text-gradient">戰情室</span></h1>
+                        <p className="text-apple-subtext font-medium tracking-wide">TWSE 終極 AI 監控矩陣</p>
                     </div>
-                    <p className="text-ios-gray text-lg font-medium">尚未加入觀察名單</p>
-                    <p className="text-ios-gray text-sm mt-1">請上方輸入代號加入</p>
-                 </div>
-              ) : (
-                 sortedStocks.map(code => (
-                    <StockCard 
-                       key={code} 
-                       code={code} 
-                       onDelete={removeStock} 
-                       apiKey={apiKey}
-                       openSettings={() => setIsSettingsOpen(true)}
-                       showToast={showToast}
-                       onSignalUpdate={handleSignalUpdate}
-                    />
-                 ))
-              )}
-           </div>
+                </div>
 
-           <InfoModal
-              isOpen={isInfoOpen}
-              onClose={() => setIsInfoOpen(false)}
-           />
+                <div className="col-span-2 md:col-span-2 xl:col-span-2 bg-apple-card rounded-[32px] border border-apple-border p-6 flex flex-col justify-center bento-card">
+                    <div className="text-[12px] font-bold text-apple-subtext uppercase tracking-widest mb-3">AI 引擎授權金鑰</div>
+                    <input type="password" value={apiKey} onChange={e => { setApiKey(e.target.value); localStorage.setItem("gemini_api_key", e.target.value); }} placeholder="輸入 Gemini API Key" className="w-full bg-black border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors" />
+                </div>
 
-           <SettingsModal 
-              isOpen={isSettingsOpen} 
-              onClose={() => setIsSettingsOpen(false)}
-              apiKey={apiKey}
-              setApiKey={setApiKey}
-              stocks={stocks}
-              setStocks={setStocks}
-              showToast={showToast}
-           />
-           
-           <div className="text-center mt-10 text-[11px] text-ios-gray3 pb-safe">
-              資料來源: Yahoo Finance & TWSE <br/> AI 分析僅供參考，投資請謹慎
-           </div>
+                <div className="col-span-2 md:col-span-2 xl:col-span-2 bg-apple-card rounded-[32px] border border-apple-border p-6 flex flex-col justify-center bento-card">
+                    <div className="text-[12px] font-bold text-apple-subtext uppercase tracking-widest mb-3">Track New Stock</div>
+                    <form onSubmit={(e) => { e.preventDefault(); if(inputCode) { setStocks([inputCode, ...stocks]); setInputCode(""); } }} className="flex gap-2">
+                        <input type="text" value={inputCode} onChange={e => setInputCode(e.target.value)} placeholder="代號 (如: 2330)" className="w-full bg-black border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white/30" />
+                        <button type="submit" className="bg-white text-black font-bold px-4 py-2.5 rounded-xl hover:bg-gray-200 transition-colors text-sm">Add</button>
+                    </form>
+                </div>
+
+                <div className="col-span-1 md:col-span-1 xl:col-span-1 bg-apple-card rounded-[32px] border border-apple-border p-6 flex flex-col justify-center items-center bento-card text-center">
+                    <div className="text-4xl font-black text-white">{stats.total}</div>
+                    <div className="text-[10px] font-bold text-apple-subtext uppercase tracking-widest mt-2 leading-tight">Total<br/>Tracked</div>
+                </div>
+                <div className="col-span-1 md:col-span-1 xl:col-span-1 bg-apple-card rounded-[32px] border border-apple-border p-6 flex flex-col justify-center items-center bento-card text-center">
+                    <div className="text-4xl font-black bg-gradient-blue text-gradient drop-shadow-[0_0_10px_rgba(10,132,255,0.4)]">{stats.buyCount}</div>
+                    <div className="text-[10px] font-bold text-apple-subtext uppercase tracking-widest mt-2 leading-tight">Buy<br/>Signals</div>
+                </div>
+                <div className="col-span-2 md:col-span-2 xl:col-span-2 bg-apple-card rounded-[32px] border border-apple-border p-6 flex flex-col justify-center items-center bento-card text-center">
+                    <div className="text-[12px] font-bold text-apple-subtext uppercase tracking-widest mb-1">Sell Alerts</div>
+                    <div className="text-4xl font-black bg-gradient-orange text-gradient drop-shadow-[0_0_10px_rgba(255,159,10,0.4)]">{stats.sellCount}</div>
+                </div>
+
+                {stocks.map(code => (
+                    <StockBento key={code} code={code} onDelete={removeStock} onSignalUpdate={handleSignalUpdate} apiKey={apiKey} />
+                ))}
+
+            </div>
+            
+            <div className="text-center mt-16 pb-8 text-xs text-apple-subtext font-medium tracking-wide">
+                Designed for Abin. Powered by AI Technical Analysis.
+            </div>
         </div>
       );
     };
