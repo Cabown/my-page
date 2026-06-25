@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>阿彬戰情室 - Apple Pro 級</title>
+    <title>阿彬戰情室 -0626更新UI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -37,19 +37,17 @@
             animation: {
               'scale-in': 'scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
               'fade-in': 'fadeIn 0.2s ease-out',
-              'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
             },
             keyframes: {
               scaleIn: { '0%': { transform: 'scale(0.95)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } },
               fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-              slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
             }
           }
         }
       }
     </script>
     <style>
-      body { background-color: #000000; color: #F5F5F7; -webkit-font-smoothing: antialiased; }
+      body { background-color: #000000; color: #F5F5F7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .bento-card { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease; }
       .bento-card:hover { transform: scale(1.02); background-color: #1c1c1e; }
@@ -73,7 +71,7 @@
     const RefreshCw = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.5 15a9 9 0 0 1 14.8-8.2l-2.4 2.3"></path><path d="M20.5 9a9 9 0 0 1-14.8 8.2l2.4-2.3"></path></svg>);
     const Trash2 = ({ size = 20, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>);
 
-    // --- 真實 API 與技術指標還原 ---
+    // --- 真實 API 與技術指標 ---
     const callGeminiApi = async (userApiKey, userQuery, systemPrompt, useSearch = false) => {
         let finalKey = userApiKey || (typeof API_KEY !== 'undefined' ? API_KEY : null);
         if (!finalKey) throw new Error("請先設定 Gemini API Key");
@@ -99,30 +97,22 @@
     };
 
     const fetchStockName = async (code) => {
-      // 1. 內建常見台股與 ETF 字典 (瞬間讀取，絕對不怕被證交所阻擋)
       const stockNames = {
         "2330": "台積電", "2317": "鴻海", "0050": "元大台灣50", 
         "0056": "元大高股息", "2454": "聯發科", "2603": "長榮", 
         "2382": "廣達", "3231": "緯創", "2303": "聯電", 
         "2881": "富邦金", "2891": "中信金", "00878": "國泰永續高息",
-        "00919": "群益台灣精選高息", "00929": "復華台灣科技優息",
-        "00940": "元大台灣價值高息", "2308": "台達電"
+        "00919": "群益精選高息", "00929": "復華科技優息",
+        "00940": "元大價值高息", "2308": "台達電"
       };
-      
-      // 如果代號在字典裡，秒速回傳中文名字
       if (stockNames[code]) return stockNames[code];
 
-      // 2. 如果是不在字典裡的冷門股，才去證交所 API 抓取
       try {
         let data = await fetchWithProxy(`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${code}.tw&json=1&delay=0`);
         if (data?.msgArray?.[0]?.n) return data.msgArray[0].n;
-        
         data = await fetchWithProxy(`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=otc_${code}.tw&json=1&delay=0`);
         return data?.msgArray?.[0]?.n || code;
-      } catch { 
-        // 萬一網路又被擋，安全降級顯示代號
-        return code; 
-      }
+      } catch { return code; }
     };
 
     const lastValid = (arr) => { for (let i = arr.length - 1; i >= 0; i--) if (typeof arr[i] === "number" && !isNaN(arr[i])) return arr[i]; return null; };
@@ -180,7 +170,7 @@
       return { bear, bull };
     };
 
-    // --- K線圖元件 (Dark Mode 適配版，支援大版面伸展) ---
+    // --- 動態縮放 K線圖元件 ---
     const CandlestickChart = ({ data }) => {
         if (!data || data.closes.length === 0) return null;
         const count = data.closes.length;
@@ -199,15 +189,15 @@
         const plotMin = minPrice - padding;
         const plotRange = plotMax - plotMin;
 
-        const chartW = 600; const chartH = 200;
+        const chartW = 1200; const chartH = 400;
         const candleWidth = (chartW / displayCount) * 0.4;
         const spacing = chartW / displayCount;
 
         return (
-            <div className="w-full h-48 md:h-64 mt-2 relative">
-                <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-full" preserveAspectRatio="none">
+            <div className="w-full h-full relative flex-1 min-h-[180px] lg:min-h-0">
+                <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-full absolute inset-0" preserveAspectRatio="none">
                     {[0.2, 0.4, 0.6, 0.8].map(p => (
-                        <line key={p} x1="0" y1={chartH * p} x2={chartW} y2={chartH * p} className="stroke-white/10" strokeWidth="0.5" strokeDasharray="4 4" />
+                        <line key={p} x1="0" y1={chartH * p} x2={chartW} y2={chartH * p} className="stroke-white/10" strokeWidth="1" strokeDasharray="6 6" />
                     ))}
                     {slicedCloses.map((close, i) => {
                         const open = slicedOpens[i];
@@ -224,13 +214,13 @@
                         
                         return (
                             <g key={i}>
-                                <line x1={x + candleWidth/2} y1={yHigh} x2={x + candleWidth/2} y2={yLow} stroke={displayColor} strokeWidth="1.5" strokeLinecap="round"/>
-                                <rect x={x} y={Math.min(yOpen, yClose)} width={candleWidth} height={Math.abs(yClose - yOpen) || 1} fill={displayColor} rx="1" />
+                                <line x1={x + candleWidth/2} y1={yHigh} x2={x + candleWidth/2} y2={yLow} stroke={displayColor} strokeWidth="2" strokeLinecap="round"/>
+                                <rect x={x} y={Math.min(yOpen, yClose)} width={candleWidth} height={Math.abs(yClose - yOpen) || 1} fill={displayColor} rx="2" />
                             </g>
                         );
                     })}
                 </svg>
-                <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-between text-[10px] text-gray-500 py-1 pointer-events-none font-bold">
+                <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-between text-[11px] md:text-sm text-gray-500 py-1 pointer-events-none font-bold">
                      <span>{maxPrice.toFixed(1)}</span>
                      <span>{minPrice.toFixed(1)}</span>
                 </div>
@@ -238,7 +228,7 @@
         );
     };
 
-    // --- 獨立股票卡片元件 (帶全新 Bento Grid 彈窗) ---
+    // --- 獨立股票卡片與 終極版 Modal ---
     const StockBento = ({ code, onDelete, onSignalUpdate, apiKey }) => {
         const [data, setData] = useState(null);
         const [loading, setLoading] = useState(true);
@@ -337,9 +327,11 @@
         if (data.signalType === 'buy') { signalText = "買進"; signalColor = "bg-gradient-blue text-gradient font-bold drop-shadow-[0_0_10px_rgba(10,132,255,0.4)]"; }
         if (data.signalType === 'sell') { signalText = "賣出"; signalColor = "bg-gradient-orange text-gradient font-bold drop-shadow-[0_0_10px_rgba(255,159,10,0.4)]"; }
 
+        const hasAiResult = aiResult.news || aiResult.strategy || aiResult.levels || aiResult.risk;
+
         return (
             <>
-                {/* 外部面板 (點擊觸發 Dashboard Modal) */}
+                {/* --- 外部卡片：加入 shrink-0 預防字體裁切 --- */}
                 <div onClick={() => setShowModal(true)} className="col-span-2 md:col-span-2 xl:col-span-2 bg-apple-card rounded-[32px] border border-apple-border p-6 flex flex-col justify-between relative overflow-hidden bento-card group cursor-pointer">
                     <button onClick={(e) => { e.stopPropagation(); onDelete(code); }} className="absolute top-4 right-4 text-gray-600 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity z-10">
                         <XCircle size={18} />
@@ -349,183 +341,179 @@
                             <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">代號 {data.code}</div>
                             <div className="text-xl font-bold tracking-tight text-white">{data.name}</div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right shrink-0">
                             <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">RSI 強度</div>
                             <div className="text-lg font-bold text-white">{data.rsi}</div>
                         </div>
                     </div>
                     <div className="mt-6 flex justify-between items-end">
-                        <div>
-                            <div className={`text-4xl font-black tracking-tighter ${gradientClass} text-gradient ${shadowClass}`}>
+                        <div className="shrink-0">
+                            <div className={`text-4xl font-black tracking-tighter ${gradientClass} text-gradient ${shadowClass} pb-2`}>
                                 {data.price.toFixed(2)}
                             </div>
                             <div className={`text-sm font-bold mt-1 ${isUp ? 'text-red-400' : 'text-green-400'}`}>
                                 {isUp ? '▲' : '▼'} {Math.abs(data.change).toFixed(2)}
                             </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right shrink-0">
                             <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">AI 判定</div>
-                            <div className={`text-xl ${signalColor}`}>{signalText}</div>
+                            {/* 加入 leading-normal 與 pb-1 完美解決裁切問題 */}
+                            <div className={`text-xl font-black leading-normal pb-1 ${signalColor}`}>{signalText}</div>
                         </div>
                     </div>
                 </div>
 
-                {/* --- 終極版：Bento Grid 數據牆 (Dashboard in Dashboard) --- */}
+                {/* --- 🌟 12x6 網格：終極無裁切修復版 🌟 --- */}
                 {showModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10 animate-fade-in">
-                        {/* 超暗背景與毛玻璃 */}
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 lg:p-6 animate-fade-in">
                         <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={() => setShowModal(false)}></div>
                         
-                        {/* 容器 */}
-                        <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar relative z-10 animate-scale-in">
+                        <div className="w-full h-[96vh] max-w-[1800px] flex flex-col relative z-10 animate-scale-in">
                             
-                            {/* 關閉按鈕 */}
-                            <div className="sticky top-0 right-0 flex justify-end z-20 mb-4 pointer-events-none">
-                                <button onClick={() => setShowModal(false)} className="pointer-events-auto bg-[#151516] border border-white/10 text-gray-400 hover:text-white p-3 rounded-full shadow-2xl transition-transform active:scale-90">
-                                    <X size={20}/>
-                                </button>
-                            </div>
+                            <button onClick={() => setShowModal(false)} className="absolute -top-1 -right-1 md:top-2 md:right-2 z-50 bg-[#151516] border border-white/10 text-gray-400 hover:text-white p-2 md:p-3 rounded-full shadow-2xl transition-transform active:scale-90">
+                                <X size={20}/>
+                            </button>
 
-                            {/* 內部 Bento Grid */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pb-10">
+                            <div className="flex-1 w-full h-full grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 lg:grid-rows-6 gap-3 lg:gap-4 overflow-y-auto lg:overflow-hidden no-scrollbar pt-12 lg:pt-0 pb-6 lg:pb-0">
                                 
-                                {/* 1. Hero 標題與股價 (Span 2 md:Span 4) */}
-                                <div className="col-span-2 md:col-span-4 bg-[#151516] border border-white/5 rounded-[32px] p-8 flex flex-col md:flex-row justify-between items-start md:items-center bento-card relative overflow-hidden">
-                                    {/* 氛圍背景光 */}
-                                    <div className={`absolute top-0 right-0 w-64 h-64 rounded-full mix-blend-screen filter blur-[80px] opacity-20 pointer-events-none ${isUp ? 'bg-red-500' : 'bg-green-500'}`}></div>
+                                {/* 1. Hero 標題與股價 [4列 x 2行] */}
+                                <div className="col-span-2 md:col-span-4 lg:col-span-4 lg:row-span-2 bg-[#151516] border border-white/5 rounded-[28px] p-5 lg:p-6 flex flex-col justify-between items-start bento-card relative overflow-hidden">
+                                    <div className={`absolute top-0 right-0 w-48 h-48 rounded-full mix-blend-screen filter blur-[60px] opacity-20 pointer-events-none ${isUp ? 'bg-red-500' : 'bg-green-500'}`}></div>
 
-                                    <div className="relative z-10">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">{data.name}</h2>
-                                            <span className="bg-white/10 text-white/80 px-3 py-1 rounded-lg text-sm font-bold border border-white/10">{data.code}</span>
-                                        </div>
-                                        <div className="flex items-baseline gap-4 mt-4">
-                                            <span className={`text-[64px] md:text-[80px] leading-none font-black tracking-tighter ${gradientClass} text-gradient ${shadowClass}`}>
-                                                {data.price.toFixed(2)}
-                                            </span>
-                                            <span className={`text-2xl font-bold ${isUp ? 'text-red-400' : 'text-green-400'}`}>
-                                                {isUp ? '▲' : '▼'} {Math.abs(data.change).toFixed(2)}
-                                            </span>
+                                    <div className="relative z-10 w-full mb-1 shrink-0">
+                                        <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">Stock Info</div>
+                                        <div className="flex items-center gap-3">
+                                            <h2 className="text-3xl lg:text-4xl 2xl:text-5xl font-black text-white tracking-tight">{data.name}</h2>
+                                            <span className="bg-white/10 text-white/80 px-2 py-1 rounded-md text-xs font-bold border border-white/10">{data.code}</span>
                                         </div>
                                     </div>
-                                    <div className="mt-6 md:mt-0 text-left md:text-right relative z-10">
-                                        <div className="text-[12px] font-bold text-apple-subtext uppercase tracking-widest mb-2">AI 戰略判定</div>
-                                        <div className={`text-4xl md:text-5xl font-black ${signalColor}`}>{signalText}</div>
+                                    <div className="relative z-10 w-full mb-1 shrink-0">
+                                        <div className={`text-[48px] lg:text-[64px] 2xl:text-[76px] leading-none font-black tracking-tighter ${gradientClass} text-gradient ${shadowClass} pb-2`}>
+                                            {data.price.toFixed(2)}
+                                        </div>
+                                        <div className={`text-lg font-bold mt-1 ${isUp ? 'text-red-400' : 'text-green-400'}`}>
+                                            {isUp ? '▲' : '▼'} {Math.abs(data.change).toFixed(2)}
+                                        </div>
+                                    </div>
+                                    {/* 修正：加入 shrink-0、leading-normal、pt-1 與 pb-2 防止字體擠壓裁切 */}
+                                    <div className="relative z-10 w-full border-t border-white/10 pt-2 shrink-0">
+                                        <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">AI 戰略判定</div>
+                                        <div className={`text-2xl 2xl:text-3xl font-black leading-normal pt-1 pb-2 ${signalColor}`}>{signalText}</div>
                                     </div>
                                 </div>
 
-                                {/* 2. RSI 強度 */}
-                                <div className="col-span-1 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center items-center bento-card text-center">
-                                    <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-2">RSI (14)</div>
-                                    <div className="text-4xl font-black text-white">{data.rsi}</div>
+                                {/* 2-5. 指標小卡 [2列 x 1行 各自] */}
+                                <div className="col-span-1 lg:col-span-2 lg:row-span-1 bg-[#151516] border border-white/5 rounded-[28px] p-4 flex flex-col justify-center items-center bento-card text-center shrink-0">
+                                    <div className="text-[10px] lg:text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">RSI (14)</div>
+                                    <div className="text-2xl lg:text-3xl font-black text-white">{data.rsi}</div>
                                 </div>
-
-                                {/* 3. AI 信心分數 */}
-                                <div className="col-span-1 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center items-center bento-card text-center">
-                                    <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-2">AI Conf.</div>
-                                    <div className="text-4xl font-black text-white">{data.conf}</div>
+                                <div className="col-span-1 lg:col-span-2 lg:row-span-1 bg-[#151516] border border-white/5 rounded-[28px] p-4 flex flex-col justify-center items-center bento-card text-center shrink-0">
+                                    <div className="text-[10px] lg:text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">AI Conf.</div>
+                                    <div className="text-2xl lg:text-3xl font-black text-white">{data.conf}</div>
                                 </div>
-
-                                {/* 4. MA20 月線 */}
-                                <div className="col-span-1 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center items-center bento-card text-center">
-                                    <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-2">MA20 月線</div>
-                                    <div className="text-3xl font-bold text-white">{data.details.ma20.toFixed(2)}</div>
-                                    <div className={`text-[11px] mt-2 font-bold px-2 py-0.5 rounded-full ${data.price > data.details.ma20 ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
-                                        {data.price > data.details.ma20 ? '站上月線' : '跌破月線'}
-                                    </div>
+                                <div className="col-span-1 lg:col-span-2 lg:row-span-1 bg-[#151516] border border-white/5 rounded-[28px] p-4 flex flex-col justify-center items-center bento-card text-center shrink-0">
+                                    <div className="text-[10px] lg:text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">MA20 月線</div>
+                                    <div className="text-xl lg:text-2xl font-bold text-white">{data.details.ma20.toFixed(2)}</div>
                                 </div>
-
-                                {/* 5. 成交量 */}
-                                <div className="col-span-1 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center items-center bento-card text-center">
-                                    <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-2">Volume</div>
-                                    <div className={`text-3xl font-bold ${data.details.volStrength === 1 ? 'text-red-400' : 'text-green-400'}`}>
+                                <div className="col-span-1 lg:col-span-2 lg:row-span-1 bg-[#151516] border border-white/5 rounded-[28px] p-4 flex flex-col justify-center items-center bento-card text-center shrink-0">
+                                    <div className="text-[10px] lg:text-[11px] font-bold text-apple-subtext uppercase tracking-widest mb-1">Volume</div>
+                                    <div className={`text-xl lg:text-2xl font-bold ${data.details.volStrength === 1 ? 'text-red-400' : 'text-green-400'}`}>
                                         {Math.floor(data.details.volume/1000)}k
                                     </div>
                                 </div>
 
-                                {/* 6. 滿版 K 線圖 (Span 2 md:Span 4) */}
-                                <div className="col-span-2 md:col-span-4 bg-[#151516] border border-white/5 rounded-[32px] p-6 md:p-8 bento-card">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <div className="text-[12px] font-bold text-apple-subtext uppercase tracking-widest">K-Line Chart</div>
-                                        <button onClick={(e) => { e.stopPropagation(); fetchData(); }} className="text-apple-subtext hover:text-white flex items-center gap-1.5 text-xs font-bold transition-colors">
-                                            <RefreshCw size={14}/> Refresh
+                                {/* 6. 滿版無縫 K 線圖 [8列 x 3行] */}
+                                <div className="col-span-2 md:col-span-4 lg:col-span-8 lg:row-span-3 bg-[#151516] border border-white/5 rounded-[28px] p-5 lg:p-6 bento-card flex flex-col min-h-[250px] lg:min-h-0">
+                                    <div className="flex justify-between items-center mb-3 flex-none shrink-0">
+                                        <div className="text-[11px] lg:text-[12px] font-bold text-apple-subtext uppercase tracking-widest">K-Line Chart</div>
+                                        <button onClick={(e) => { e.stopPropagation(); fetchData(); }} className="text-apple-subtext hover:text-white flex items-center gap-1 text-xs font-bold transition-colors">
+                                            <RefreshCw size={12}/> Update
                                         </button>
                                     </div>
-                                    <CandlestickChart data={data.history} />
+                                    <div className="flex-1 w-full relative">
+                                        <CandlestickChart data={data.history} />
+                                    </div>
                                 </div>
 
-                                {/* 7. MACD 詳細數據 (Span 2) */}
-                                <div className="col-span-2 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center bento-card">
-                                    <div className="flex justify-between items-center mb-5">
-                                        <div className="text-[12px] font-bold text-apple-subtext uppercase tracking-widest">MACD Indicator</div>
-                                        <div className={`text-xs font-bold px-3 py-1 rounded-full ${data.details.hist > 0 ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
-                                            {data.details.macd > data.details.signalLine ? '黃金交叉' : '死亡交叉'} / 柱狀線 {data.details.hist > 0 ? '擴大' : '縮小'}
+                                {/* 7. MACD 詳細數據 [4列 x 1行] */}
+                                <div className="col-span-2 md:col-span-2 lg:col-span-4 lg:row-span-1 bg-[#151516] border border-white/5 rounded-[28px] p-5 flex flex-col justify-center bento-card shrink-0">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <div className="text-[11px] font-bold text-apple-subtext uppercase tracking-widest">MACD</div>
+                                        <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${data.details.hist > 0 ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                                            {data.details.macd > data.details.signalLine ? '黃金交叉' : '死亡交叉'}
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-end">
                                         <div>
-                                            <div className="text-[11px] text-gray-500 mb-1 uppercase font-bold">DIF (MACD)</div>
-                                            <div className="text-2xl font-bold text-white">{data.details.macd.toFixed(2)}</div>
+                                            <div className="text-[10px] text-gray-500 mb-0.5 uppercase font-bold">DIF</div>
+                                            <div className="text-xl lg:text-2xl font-bold text-white">{data.details.macd.toFixed(2)}</div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-[11px] text-gray-500 mb-1 uppercase font-bold">9EMA (Signal)</div>
-                                            <div className="text-2xl font-bold text-white">{data.details.signalLine.toFixed(2)}</div>
+                                            <div className="text-[10px] text-gray-500 mb-0.5 uppercase font-bold">9EMA</div>
+                                            <div className="text-xl lg:text-2xl font-bold text-white">{data.details.signalLine.toFixed(2)}</div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* 8. 操作與標籤 (Span 2) */}
-                                <div className="col-span-2 bg-[#151516] border border-white/5 rounded-[32px] p-6 flex flex-col justify-center bento-card text-center gap-3">
-                                    <div className="text-[12px] font-bold text-apple-subtext uppercase tracking-widest mb-1 text-left">Quick Actions</div>
+                                {/* 8. 快速操作 [4列 x 1行] - 和 AI 按鈕交換位置，完美填補左下角 */}
+                                <div className="col-span-2 md:col-span-2 lg:col-span-4 lg:row-span-1 bg-[#151516] border border-white/5 rounded-[28px] p-4 flex flex-col justify-center bento-card text-center gap-2 shrink-0">
                                     <div className="grid grid-cols-2 gap-3 h-full">
-                                        <div className="flex flex-col items-center justify-center gap-2 bg-white/5 rounded-2xl p-4 border border-white/5">
-                                            <Clock size={20} className="text-gray-400"/>
+                                        <div className="flex items-center justify-center gap-2 bg-white/5 rounded-[20px] p-2 border border-white/5">
+                                            <Clock size={16} className="text-gray-400"/>
                                             <span className="text-xs font-bold text-gray-400">{new Date().toLocaleDateString()}</span>
                                         </div>
-                                        <button onClick={(e) => { e.stopPropagation(); onDelete(code); setShowModal(false); }} className="flex flex-col items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 rounded-2xl p-4 transition-colors border border-red-500/10">
-                                            <Trash2 size={20} className="text-red-400"/>
+                                        <button onClick={(e) => { e.stopPropagation(); onDelete(code); setShowModal(false); }} className="flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 rounded-[20px] p-2 transition-colors border border-red-500/10 group">
+                                            <Trash2 size={16} className="text-red-400 group-active:scale-90 transition-transform"/>
                                             <span className="text-xs font-bold text-red-400">刪除監控</span>
                                         </button>
                                     </div>
                                 </div>
 
-                                {/* 9. AI 戰略執行按鈕 (Span 2 md:Span 4) */}
-                                <div className="col-span-2 md:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-                                    <button onClick={() => runAI('news')} disabled={aiResult.loading} className="bg-[#151516] border border-blue-500/20 hover:bg-blue-500/10 rounded-[24px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card">
+                                {/* 9. AI 戰略按鈕 [4列 x 2行 的內部 2x2 網格] */}
+                                <div className="col-span-2 md:col-span-4 lg:col-span-4 lg:row-span-2 grid grid-cols-2 grid-rows-2 gap-3 lg:gap-4 shrink-0">
+                                    <button onClick={() => runAI('news')} disabled={aiResult.loading} className="bg-[#151516] border border-blue-500/20 hover:bg-blue-500/10 rounded-[28px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card active:scale-95">
                                         <Sparkles size={24} className="text-blue-400"/>
-                                        <span className="text-sm font-bold text-blue-400">新聞摘要</span>
+                                        <span className="text-[13px] font-bold text-blue-400">新聞摘要</span>
                                     </button>
-                                    <button onClick={() => runAI('strategy')} disabled={aiResult.loading} className="bg-[#151516] border border-blue-500/20 hover:bg-blue-500/10 rounded-[24px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card">
+                                    <button onClick={() => runAI('strategy')} disabled={aiResult.loading} className="bg-[#151516] border border-blue-500/20 hover:bg-blue-500/10 rounded-[28px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card active:scale-95">
                                         <Brain size={24} className="text-blue-400"/>
-                                        <span className="text-sm font-bold text-blue-400">AI 診斷</span>
+                                        <span className="text-[13px] font-bold text-blue-400">AI 診斷</span>
                                     </button>
-                                    <button onClick={() => runAI('levels')} disabled={aiResult.loading} className="bg-[#151516] border border-orange-500/20 hover:bg-orange-500/10 rounded-[24px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card">
+                                    <button onClick={() => runAI('levels')} disabled={aiResult.loading} className="bg-[#151516] border border-orange-500/20 hover:bg-orange-500/10 rounded-[28px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card active:scale-95">
                                         <Target size={24} className="text-orange-400"/>
-                                        <span className="text-sm font-bold text-orange-400">支撐壓力</span>
+                                        <span className="text-[13px] font-bold text-orange-400">支撐壓力</span>
                                     </button>
-                                    <button onClick={() => runAI('risk')} disabled={aiResult.loading} className="bg-[#151516] border border-purple-500/20 hover:bg-purple-500/10 rounded-[24px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card">
+                                    <button onClick={() => runAI('risk')} disabled={aiResult.loading} className="bg-[#151516] border border-purple-500/20 hover:bg-purple-500/10 rounded-[28px] p-4 flex flex-col items-center justify-center gap-2 transition-colors bento-card active:scale-95">
                                         <ShieldAlert size={24} className="text-purple-400"/>
-                                        <span className="text-sm font-bold text-purple-400">風險評估</span>
+                                        <span className="text-[13px] font-bold text-purple-400">風險評估</span>
                                     </button>
                                 </div>
 
-                                {/* 10. AI 輸出結果牆 (有內容時才顯示) */}
-                                {(aiResult.news || aiResult.strategy || aiResult.levels || aiResult.risk) && (
-                                    <div className="col-span-2 md:col-span-4 bg-[#151516] border border-white/5 rounded-[32px] p-6 md:p-8 bento-card animate-slide-up space-y-6">
-                                        {aiResult.news && (
-                                            <div><div className="text-[12px] font-bold text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Sparkles size={16}/> 新聞重點</div><p className="text-[15px] text-gray-300 leading-relaxed font-medium">{aiResult.news}</p></div>
-                                        )}
-                                        {aiResult.strategy && (
-                                            <div className={aiResult.news ? "pt-4 border-t border-white/10" : ""}><div className="text-[12px] font-bold text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Brain size={16}/> 策略建議</div><p className="text-[15px] text-gray-300 leading-relaxed font-medium">{aiResult.strategy}</p></div>
-                                        )}
-                                        {aiResult.levels && (
-                                            <div className={(aiResult.news || aiResult.strategy) ? "pt-4 border-t border-white/10" : ""}><div className="text-[12px] font-bold text-orange-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Target size={16}/> 關鍵價位</div><p className="text-[15px] text-gray-300 font-medium">{aiResult.levels}</p></div>
-                                        )}
-                                        {aiResult.risk && (
-                                            <div className={(aiResult.news || aiResult.strategy || aiResult.levels) ? "pt-4 border-t border-white/10" : ""}><div className="text-[12px] font-bold text-purple-400 uppercase tracking-widest mb-2 flex items-center gap-2"><ShieldAlert size={16}/> 風險評估</div><p className="text-[15px] text-gray-300 font-medium">{aiResult.risk}</p></div>
-                                        )}
-                                    </div>
-                                )}
+                                {/* 10. AI 輸出結果終端機 [8列 x 2行] */}
+                                <div className="col-span-2 md:col-span-4 lg:col-span-8 lg:row-span-2 bg-[#151516] border border-white/5 rounded-[28px] p-5 lg:p-6 bento-card overflow-y-auto no-scrollbar relative min-h-[120px]">
+                                    {!hasAiResult ? (
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-600 opacity-40">
+                                            <Sparkles size={32} className="mb-2" />
+                                            <div className="font-bold uppercase tracking-widest text-[11px]">Awaiting AI Directive ...</div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4 animate-fade-in relative z-10">
+                                            {aiResult.news && (
+                                                <div><div className="text-[11px] font-bold text-blue-400 uppercase tracking-widest mb-1 flex items-center gap-1.5"><Sparkles size={14}/> 新聞重點</div><p className="text-[13px] lg:text-[14px] text-gray-300 leading-relaxed font-medium">{aiResult.news}</p></div>
+                                            )}
+                                            {aiResult.strategy && (
+                                                <div className={aiResult.news ? "pt-3 border-t border-white/10" : ""}><div className="text-[11px] font-bold text-blue-400 uppercase tracking-widest mb-1 flex items-center gap-1.5"><Brain size={14}/> 策略建議</div><p className="text-[13px] lg:text-[14px] text-gray-300 leading-relaxed font-medium">{aiResult.strategy}</p></div>
+                                            )}
+                                            {aiResult.levels && (
+                                                <div className={(aiResult.news || aiResult.strategy) ? "pt-3 border-t border-white/10" : ""}><div className="text-[11px] font-bold text-orange-400 uppercase tracking-widest mb-1 flex items-center gap-1.5"><Target size={14}/> 關鍵價位</div><p className="text-[13px] lg:text-[14px] text-gray-300 font-medium">{aiResult.levels}</p></div>
+                                            )}
+                                            {aiResult.risk && (
+                                                <div className={(aiResult.news || aiResult.strategy || aiResult.levels) ? "pt-3 border-t border-white/10" : ""}><div className="text-[11px] font-bold text-purple-400 uppercase tracking-widest mb-1 flex items-center gap-1.5"><ShieldAlert size={14}/> 風險評估</div><p className="text-[13px] lg:text-[14px] text-gray-300 font-medium">{aiResult.risk}</p></div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                
                             </div>
                         </div>
                     </div>
