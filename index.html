@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -325,6 +326,17 @@
             </div>
             <div class="relative h-52 sm:h-56">
               <canvas id="chart-rsi"></canvas>
+            </div>
+          </div>
+
+          <!-- KD Chart -->
+          <div class="card-surface rounded-xl p-5 lg:col-span-3 space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h3 class="font-semibold text-sm">KD 隨機指標 (9, 3, 3)</h3>
+              <span id="ana-kd-summary" class="text-[11px] font-medium tabular-nums text-[var(--text-muted)]">--</span>
+            </div>
+            <div class="relative h-52 sm:h-56">
+              <canvas id="chart-kd"></canvas>
             </div>
           </div>
 
@@ -704,7 +716,7 @@
       notes: []
     };
 
-    let charts = { price: null, rsi: null, macd: null };
+    let charts = { price: null, rsi: null, kd: null, macd: null };
     let editingNoteId = null;
 
     function loadState() {
@@ -782,6 +794,39 @@
       return out;
     }
 
+    function calcKDSeries(highs, lows, closes, n = 9) {
+      const kLine = [];
+      const dLine = [];
+      let k = 50;
+      let d = 50;
+      for (let i = 0; i < closes.length; i++) {
+        if (i < n - 1) {
+          kLine.push(null);
+          dLine.push(null);
+          continue;
+        }
+        const hSlice = highs.slice(i - n + 1, i + 1);
+        const lSlice = lows.slice(i - n + 1, i + 1);
+        const maxH = Math.max(...hSlice);
+        const minL = Math.min(...lSlice);
+        const rsv = (maxH === minL) ? 50 : ((closes[i] - minL) / (maxH - minL)) * 100;
+        k = (2 / 3) * k + (1 / 3) * rsv;
+        d = (2 / 3) * d + (1 / 3) * k;
+        kLine.push(Number(k.toFixed(2)));
+        dLine.push(Number(d.toFixed(2)));
+      }
+      const lastK = kLine[kLine.length - 1] ?? 50;
+      const lastD = dLine[dLine.length - 1] ?? 50;
+      const prevK = kLine.length > 1 && kLine[kLine.length - 2] !== null ? kLine[kLine.length - 2] : lastK;
+      const prevD = dLine.length > 1 && dLine[dLine.length - 2] !== null ? dLine[dLine.length - 2] : lastD;
+      let status = lastK >= lastD ? 'K > D 偏多' : 'K < D 偏空';
+      if (prevK <= prevD && lastK > lastD) status = '黃金交叉';
+      else if (prevK >= prevD && lastK < lastD) status = '死亡交叉';
+      else if (lastK >= 80 && lastD >= 80) status = '高檔鈍化區';
+      else if (lastK <= 20 && lastD <= 20) status = '低檔超賣區';
+      return { kLine, dLine, last: { k: lastK, d: lastD, status } };
+    }
+
     function calcMACDSeries(closes) {
       if (closes.length < 35) return { macdLine: [], signalLine: [], histLine: [], last: { macd: 0, signal: 0, hist: 0 } };
       const ema12 = emaSeries(closes, 12);
@@ -853,6 +898,7 @@
       const volStrength = (lastVol > avgV10 * 1.1) ? 1 : -1;
 
       const macdData = calcMACDSeries(closes);
+      const kdData = calcKDSeries(highs, lows, closes, 9);
       const fb = detectFalseBreakout(highs, lows, closes, volumes, 0.001, 1.2);
 
       const tech = (rsi14 < 40 && rsi28 < 45) ? 0.2 : (rsi14 > 70 && rsi28 > 65) ? 0.8 : 0.5;
@@ -894,6 +940,7 @@
         avgV10,
         volStrength,
         macd: macdData.last,
+        kd: kdData.last,
         fb,
         tech,
         macdAdj,
@@ -908,6 +955,8 @@
           ma20: ma20Series,
           rsi14: calcRSISeries(closes, 14),
           rsi28: calcRSISeries(closes, 28),
+          kLine: kdData.kLine,
+          dLine: kdData.dLine,
           macdLine: macdData.macdLine,
           signalLine: macdData.signalLine,
           histLine: macdData.histLine
@@ -1280,9 +1329,10 @@
             </div>
 
             <div class="pt-3 border-t border-[var(--border-color)] flex items-center justify-between text-xs text-[var(--text-muted)]">
-              <div class="flex items-center gap-3 tabular-nums">
+              <div class="flex items-center gap-2.5 tabular-nums">
                 <span>RSI <strong class="text-[var(--text-main)] font-medium">${s.rsi14.toFixed(1)}</strong></span>
-                <span>信心 <strong class="text-[var(--text-main)] font-medium">${s.conf}</strong>/100</span>
+                <span>K <strong class="text-[var(--text-main)] font-medium">${s.kd.k.toFixed(1)}</strong></span>
+                <span>信心 <strong class="text-[var(--text-main)] font-medium">${s.conf}</strong></span>
               </div>
               <div class="flex items-center gap-2">
                 ${fbHtml}
@@ -1341,6 +1391,8 @@
       document.getElementById('ana-rsi-ma').textContent = `${s.rsi14.toFixed(1)} / ${formatNum(s.ma20, 1)}`;
 
       document.getElementById('ana-conf-total').textContent = `${s.conf} / 100`;
+      document.getElementById('ana-kd-summary').textContent =
+        `K(9) ${s.kd.k.toFixed(1)} · D(9) ${s.kd.d.toFixed(1)} · ${s.kd.status}`;
       document.getElementById('ana-macd-summary').textContent =
         `MACD ${s.macd.macd.toFixed(2)} · Signal ${s.macd.signal.toFixed(2)} · Hist ${s.macd.hist.toFixed(2)}`;
 
@@ -1409,6 +1461,25 @@
           datasets: [
             { label: 'RSI(14)', data: s.series.rsi14, borderColor: linePrimary, borderWidth: 1.8, pointRadius: 0, tension: 0.15 },
             { label: 'RSI(28)', data: s.series.rsi28, borderColor: goldLine, borderWidth: 1.5, pointRadius: 0, tension: 0.15 }
+          ]
+        },
+        options: {
+          ...commonOpts,
+          scales: {
+            ...commonOpts.scales,
+            y: { min: 0, max: 100, ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } }
+          }
+        }
+      });
+
+      if (charts.kd) charts.kd.destroy();
+      charts.kd = new Chart(document.getElementById('chart-kd'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'K(9)', data: s.series.kLine, borderColor: linePrimary, borderWidth: 1.8, pointRadius: 0, tension: 0.15 },
+            { label: 'D(9)', data: s.series.dLine, borderColor: goldLine, borderWidth: 1.5, pointRadius: 0, tension: 0.15 }
           ]
         },
         options: {
@@ -1831,3 +1902,5 @@
   </script>
 </body>
 </html>
+
+```
